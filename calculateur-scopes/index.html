@@ -1,0 +1,763 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Calculateur des émissions de gaz à effet de serre (scopes 1, 2 et 3) pour une entreprise, un individu, une localité ou une communauté." />
+<title>Calculateur de scopes</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root{
+    --bg:#F3F1E9;
+    --surface:#FFFFFF;
+    --ink:#1B231D;
+    --muted:#5B665E;
+    --accent:#0E6B63;
+    --accent-ink:#FFFFFF;
+    --rust:#B15A2C;
+    --line:rgba(27,35,29,0.14);
+    --s1:#B15A2C; --s2:#B8860B; --s3:#0E6B63;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#141A12; --surface:#1C231A; --ink:#ECE9DE; --muted:#A9B2A4;
+      --accent:#3FBBAC; --accent-ink:#08201C; --rust:#E0925F;
+      --line:rgba(236,233,222,0.16);
+      --s1:#E0925F; --s2:#E3BE52; --s3:#3FBBAC;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#141A12; --surface:#1C231A; --ink:#ECE9DE; --muted:#A9B2A4;
+    --accent:#3FBBAC; --accent-ink:#08201C; --rust:#E0925F;
+    --line:rgba(236,233,222,0.16);
+    --s1:#E0925F; --s2:#E3BE52; --s3:#3FBBAC;
+    color-scheme: dark;
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Public Sans', -apple-system, sans-serif; font-size:15px; line-height:1.55;
+    padding-inline:16px;
+  }
+  a{ color:var(--accent); }
+  h1,h2,h3{ font-family:'Fraunces', Georgia, serif; text-wrap:balance; margin:0; font-weight:600; }
+  .mono{ font-family:'IBM Plex Mono', ui-monospace, monospace; }
+  .kicker{
+    font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.12em;
+    color:var(--rust); text-transform:uppercase; font-weight:500;
+  }
+
+  .wrap{ max-width:1120px; margin-inline:auto; }
+  nav.top{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; padding-block:20px; }
+  nav.top a{ color:var(--muted); text-decoration:none; font-size:13.5px; font-weight:600; }
+  nav.top a:hover{ color:var(--accent); }
+
+  header.intro{ padding-block:10px 26px; }
+  header.intro h1{ font-size:clamp(1.9rem,5vw,2.6rem); line-height:1.08; margin-top:8px; }
+  header.intro p{ color:var(--muted); max-width:70ch; margin:12px 0 0; }
+
+  /* ---- type tabs ---- */
+  .tabs{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:18px; }
+  @media (max-width:720px){ .tabs{ grid-template-columns:1fr 1fr; } }
+  .tab{
+    font:inherit; text-align:left; cursor:pointer; color:var(--ink);
+    background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:12px 14px;
+    transition:border-color .15s ease, transform .15s ease;
+  }
+  .tab:hover{ border-color:var(--accent); }
+  .tab[aria-checked="true"]{ border-color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent); background:color-mix(in srgb, var(--accent) 8%, var(--surface)); }
+  .tab b{ display:block; font-family:'Fraunces',serif; font-weight:600; font-size:1.02rem; }
+  .tab span{ display:block; font-size:12.5px; color:var(--muted); margin-top:2px; }
+  .tab:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  /* ---- settings ---- */
+  .panel{ background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:16px 18px; }
+  .settings{ display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px 16px; }
+  .field label{ display:block; font-size:12px; font-weight:600; color:var(--muted); margin-bottom:4px; }
+  input, select{
+    font:inherit; font-size:14px; color:var(--ink); background:var(--bg);
+    border:1px solid var(--line); border-radius:6px; padding:7px 9px; width:100%; min-width:0;
+  }
+  input[type="number"]{ font-family:'IBM Plex Mono',monospace; font-size:13.5px; }
+  input[type="checkbox"]{ width:auto; accent-color:var(--accent); }
+  .grid-custom{ display:flex; gap:6px; align-items:center; }
+  .grid-custom input{ flex:1; }
+  .note{ font-size:12.5px; color:var(--muted); }
+
+  .toolbar{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:14px; }
+  .btn{
+    font:inherit; font-size:13px; font-weight:600; cursor:pointer;
+    display:inline-flex; align-items:center; gap:6px; padding:7px 12px; border-radius:6px;
+    border:1px solid var(--line); background:transparent; color:var(--ink);
+  }
+  .btn:hover{ border-color:var(--accent); color:var(--accent); }
+  .btn.primary{ background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+  .btn.primary:hover{ color:var(--accent-ink); filter:brightness(1.08); }
+  .btn.danger:hover{ border-color:var(--rust); color:var(--rust); }
+  .toggle{ display:inline-flex; align-items:center; gap:7px; font-size:13px; margin-left:auto; cursor:pointer; }
+
+  /* ---- layout ---- */
+  .layout{ display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:22px; margin-top:22px; align-items:start; }
+  @media (max-width:920px){ .layout{ grid-template-columns:1fr; } .results{ order:-1; } }
+
+  .scope{ margin-bottom:18px; padding:0; overflow:hidden; }
+  .scope-head{ padding:14px 18px 12px; border-bottom:1px solid var(--line); border-left:4px solid var(--c); }
+  .scope-head h2{ font-size:1.18rem; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:baseline; }
+  .scope-head h2 .sum{ font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:500; color:var(--c); }
+  .scope-head p{ margin:4px 0 0; font-size:13px; color:var(--muted); }
+  .cat{ font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); padding:12px 18px 2px; }
+
+  .row{
+    display:grid; grid-template-columns:minmax(0,1fr) 150px 140px 96px; gap:10px; align-items:center;
+    padding:8px 18px; border-top:1px solid color-mix(in srgb, var(--line) 50%, transparent);
+  }
+  .cat + .row{ border-top:none; }
+  .row .lbl{ font-size:14px; }
+  .row .hint{ display:block; font-size:11.5px; color:var(--muted); }
+  .qty, .fac{ display:flex; align-items:center; gap:5px; }
+  .qty .unit, .fac .unit{ font-size:11.5px; color:var(--muted); white-space:nowrap; font-family:'IBM Plex Mono',monospace; }
+  .fac .val{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted); }
+  .fac input{ padding:5px 6px; font-size:12.5px; }
+  .res{ text-align:right; font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:500; }
+  .res.zero{ color:var(--muted); font-weight:400; }
+  .row.custom .lbl-in{ display:flex; gap:6px; }
+  .row.custom .lbl-in input:first-child{ flex:1; }
+  .row.custom .lbl-in input.u{ width:76px; flex:none; }
+  .del{ font:inherit; border:none; background:none; color:var(--muted); cursor:pointer; font-size:16px; padding:0 4px; }
+  .del:hover{ color:var(--rust); }
+  .add-row{ padding:10px 18px 14px; }
+  @media (max-width:640px){
+    .row{ grid-template-columns:1fr 1fr; padding:10px 14px; }
+    .row > :first-child{ grid-column:1 / -1; }
+    .row .fac{ grid-column:1; }
+    .row .res{ grid-column:2; }
+    .row .qty{ grid-column:1 / -1; }
+    .scope-head, .cat, .add-row{ padding-inline:14px; }
+  }
+
+  /* ---- results ---- */
+  .results{ position:sticky; top:14px; }
+  @media (max-width:920px){ .results{ position:static; } }
+  .results .panel + .panel{ margin-top:14px; }
+  .total{ font-family:'Fraunces',serif; font-size:2.5rem; font-weight:600; line-height:1; margin-top:8px; }
+  .total small{ font-family:'Public Sans',sans-serif; font-size:.95rem; font-weight:500; color:var(--muted); margin-left:4px; }
+  .intensity{ margin-top:8px; font-size:13.5px; color:var(--muted); }
+  .intensity b{ color:var(--ink); font-family:'IBM Plex Mono',monospace; font-weight:500; }
+  .bar{ display:flex; height:14px; border-radius:7px; overflow:hidden; margin-top:16px; background:color-mix(in srgb, var(--line) 60%, transparent); gap:2px; }
+  .bar span{ display:block; height:100%; transition:width .3s ease; }
+  .legend{ list-style:none; margin:14px 0 0; padding:0; display:flex; flex-direction:column; gap:8px; }
+  .legend li{ display:grid; grid-template-columns:12px 1fr auto auto; gap:8px; align-items:center; font-size:13.5px; }
+  .legend .dot{ width:10px; height:10px; border-radius:3px; }
+  .legend .v{ font-family:'IBM Plex Mono',monospace; font-size:12.5px; }
+  .legend .p{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted); min-width:42px; text-align:right; }
+  .results h3{ font-size:1rem; margin-bottom:10px; }
+  .top-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+  .top-list li{ font-size:13px; }
+  .top-list .t{ display:flex; justify-content:space-between; gap:8px; }
+  .top-list .t span:last-child{ font-family:'IBM Plex Mono',monospace; font-size:12px; white-space:nowrap; }
+  .top-list .m{ height:5px; border-radius:3px; margin-top:4px; background:color-mix(in srgb, var(--line) 60%, transparent); overflow:hidden; }
+  .top-list .m i{ display:block; height:100%; }
+  .empty{ font-size:13px; color:var(--muted); }
+  .bench{ margin-top:14px; padding-top:12px; border-top:1px solid var(--line); font-size:13px; color:var(--muted); }
+  .bench b{ color:var(--ink); }
+
+  /* ---- method ---- */
+  details.method{ margin-top:26px; }
+  details.method summary{ cursor:pointer; font-family:'Fraunces',serif; font-weight:600; font-size:1.1rem; }
+  details.method .body{ margin-top:12px; font-size:14px; color:var(--ink); }
+  details.method .body p, details.method .body li{ max-width:78ch; }
+  details.method .body li{ margin-block:4px; }
+  footer{ margin-block:36px 40px; padding-top:20px; border-top:1px solid var(--line); font-size:12px; color:var(--muted); font-family:'IBM Plex Mono',monospace; }
+
+  .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+
+  @media print{
+    body{ background:#fff; color:#000; padding:0; }
+    nav.top, .tabs, .toolbar, .add-row, .del, details.method, .row.empty-row, .cat.empty-cat{ display:none !important; }
+    .layout{ grid-template-columns:1fr; }
+    .results{ position:static; order:-1; }
+    .panel{ break-inside:avoid; border-color:#ccc; }
+    input, select{ border:none; background:none; padding:0; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="top">
+  <a href="../">← Portfolio de Delon Boyou</a>
+  <span class="kicker">Outil · Bilan GES</span>
+</nav>
+
+<header class="intro">
+  <div class="kicker">Scopes 1 · 2 · 3</div>
+  <h1>Calculateur d'émissions de gaz à effet de serre</h1>
+  <p>Choisissez le type d'entité, saisissez vos données d'activité (litres de carburant, kWh, kilomètres, tonnes de déchets…) :
+  l'outil applique un facteur d'émission à chaque poste et répartit le résultat entre les trois scopes.
+  Les données restent dans votre navigateur.</p>
+</header>
+
+<div class="tabs" role="radiogroup" aria-label="Type d'entité" id="tabs"></div>
+
+<div class="panel">
+  <div class="settings">
+    <div class="field">
+      <label for="f-name">Nom de l'entité</label>
+      <input id="f-name" type="text" autocomplete="off" />
+    </div>
+    <div class="field">
+      <label for="f-year">Année du bilan</label>
+      <input id="f-year" type="number" min="1990" max="2100" step="1" />
+    </div>
+    <div class="field">
+      <label for="f-pop" id="f-pop-label">Effectif</label>
+      <input id="f-pop" type="number" min="0" step="any" inputmode="decimal" />
+    </div>
+    <div class="field">
+      <label for="f-country">Réseau électrique</label>
+      <select id="f-country"></select>
+    </div>
+    <div class="field">
+      <label for="f-grid">Facteur électricité</label>
+      <div class="grid-custom">
+        <input id="f-grid" type="number" min="0" step="any" />
+        <span class="note mono">kgCO₂e/kWh</span>
+      </div>
+    </div>
+    <div class="field">
+      <label for="f-cur">Devise des achats</label>
+      <select id="f-cur">
+        <option value="XOF">Franc CFA (M FCFA)</option>
+        <option value="EUR">Euro (k€)</option>
+      </select>
+    </div>
+  </div>
+  <div class="toolbar">
+    <button class="btn primary" type="button" id="b-example">Charger un exemple</button>
+    <button class="btn" type="button" id="b-csv">Exporter CSV</button>
+    <button class="btn" type="button" id="b-json">Enregistrer (.json)</button>
+    <button class="btn" type="button" id="b-import">Importer</button>
+    <button class="btn" type="button" id="b-print">Imprimer / PDF</button>
+    <button class="btn danger" type="button" id="b-reset">Effacer</button>
+    <input type="file" id="f-file" accept="application/json,.json" hidden />
+    <label class="toggle"><input type="checkbox" id="f-expert" /> Modifier les facteurs d'émission</label>
+  </div>
+</div>
+
+<div class="layout">
+  <form id="form" autocomplete="off" onsubmit="return false"></form>
+
+  <aside class="results" aria-live="polite">
+    <div class="panel">
+      <div class="kicker" id="r-title">Total</div>
+      <div class="total" id="r-total">0<small>kg CO₂e</small></div>
+      <div class="intensity" id="r-int"></div>
+      <div class="bar" id="r-bar" aria-hidden="true"></div>
+      <ul class="legend" id="r-legend"></ul>
+      <div class="bench" id="r-bench" hidden></div>
+    </div>
+    <div class="panel">
+      <h3>Principaux postes d'émission</h3>
+      <ul class="top-list" id="r-top"></ul>
+    </div>
+  </aside>
+</div>
+
+<details class="method">
+  <summary>Méthode, sources et limites</summary>
+  <div class="body">
+    <p><b>Formule.</b> Pour chaque poste : <span class="mono">émissions (kgCO₂e) = donnée d'activité × facteur d'émission</span>.
+    Les gaz autres que le CO₂ (CH₄, N₂O, gaz fluorés) sont convertis en CO₂ équivalent avec les potentiels de réchauffement global à 100 ans du 5ᵉ rapport du GIEC (CH₄ = 28, N₂O = 265).</p>
+    <p><b>Les trois scopes.</b></p>
+    <ul>
+      <li><b>Scope 1</b> — émissions directes : ce qui est brûlé ou rejeté par des sources que l'entité possède ou contrôle (ou, pour un territoire, qui se produit à l'intérieur de ses limites).</li>
+      <li><b>Scope 2</b> — émissions indirectes liées à l'électricité (et à la chaleur ou la vapeur) achetée : elles ont lieu dans la centrale, mais la consommation en est la cause.</li>
+      <li><b>Scope 3</b> — toutes les autres émissions indirectes : achats, transport de marchandises, déplacements, déchets, alimentation, utilisation des produits vendus…</li>
+    </ul>
+    <p><b>Référentiels.</b> Entreprise : <i>GHG Protocol Corporate Standard</i> (et ses 15 catégories de scope 3) ; localité : <i>Global Protocol for Community-Scale GHG Inventories</i> (GPC), qui définit les scopes par rapport aux limites géographiques du territoire ; communauté et individu : adaptation pédagogique de ces deux cadres, les scopes n'étant pas normalisés pour eux.</p>
+    <p><b>Facteurs d'émission.</b> Valeurs indicatives tirées principalement de la Base Empreinte de l'ADEME, des lignes directrices 2006 du GIEC (niveau 1, valeurs Afrique pour l'élevage) et de moyennes internationales pour les réseaux électriques. Les postes biomasse (charbon de bois, bois de chauffe) et changement d'usage des sols sont très variables selon la fraction de biomasse non renouvelable et le type de forêt. Activez « Modifier les facteurs d'émission » pour remplacer chaque valeur par un facteur officiel ou spécifique à votre contexte.</p>
+    <p><b>Limites.</b> Cet outil sert à estimer des ordres de grandeur et à identifier les postes prioritaires. Un bilan réglementaire ou certifié (ISO 14064-1, Bilan Carbone®) exige des facteurs sourcés, une incertitude quantifiée et une vérification. Les absorptions (reboisement, puits de carbone) doivent être rapportées à part et ne sont pas soustraites ici.</p>
+  </div>
+</details>
+
+<footer>Calculateur de scopes · conçu par Delon Boyou · facteurs indicatifs, à vérifier avant tout usage officiel.</footer>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  // ---------- Réseaux électriques (kgCO2e/kWh, ordres de grandeur récents) ----------
+  const GRIDS = [
+    { id:'CI', label:"Côte d'Ivoire", f:0.43 },
+    { id:'SN', label:'Sénégal', f:0.60 },
+    { id:'BF', label:'Burkina Faso', f:0.55 },
+    { id:'GH', label:'Ghana', f:0.35 },
+    { id:'CM', label:'Cameroun', f:0.22 },
+    { id:'MA', label:'Maroc', f:0.68 },
+    { id:'FR', label:'France', f:0.052 },
+    { id:'BE', label:'Belgique', f:0.15 },
+    { id:'CA', label:'Canada', f:0.12 },
+    { id:'WD', label:'Moyenne mondiale', f:0.48 },
+    { id:'XX', label:'Personnalisé', f:null },
+  ];
+  const XOF_PER_EUR = 655.957;
+
+  // ---------- Postes par type d'entité ----------
+  // f : facteur en kgCO2e par unité ; grid : multiplicateur du facteur électricité ;
+  // money : facteur en kgCO2e par k€ (converti si la devise est le FCFA).
+  const L = (scope, cat, id, label, unit, f, hint) => ({ scope, cat, id, label, unit, f, hint });
+  const G = (scope, cat, id, label, unit, mult, hint) => ({ scope, cat, id, label, unit, grid:mult, hint });
+  const M = (scope, cat, id, label, f, hint) => ({ scope, cat, id, label, money:true, f, hint });
+
+  const TYPES = {
+    entreprise: {
+      label:'Entreprise', sub:'Organisation, PME, usine',
+      pop:'Effectif (salariés)', per:'salarié',
+      scopes:{
+        1:"Émissions directes des sources détenues ou contrôlées : combustibles, véhicules de l'entreprise, fuites de fluides frigorigènes, procédés.",
+        2:"Émissions indirectes liées à l'énergie achetée : électricité, chaleur, vapeur, froid.",
+        3:"Autres émissions indirectes de la chaîne de valeur, en amont et en aval (15 catégories du GHG Protocol).",
+      },
+      lines:[
+        L(1,'Combustion fixe','gazole_fixe','Gazole — groupe électrogène, chaudière','L',3.17),
+        L(1,'Combustion fixe','fioul_lourd','Fioul lourd','kg',3.22),
+        L(1,'Combustion fixe','gaz_nat','Gaz naturel','kWh',0.227),
+        L(1,'Combustion fixe','gpl','Butane / GPL','kg',3.0),
+        L(1,'Combustion mobile','gazole_veh','Gazole — véhicules et engins','L',3.17),
+        L(1,'Combustion mobile','essence_veh','Essence — véhicules','L',2.80),
+        L(1,'Émissions fugitives','r410a','Recharge de climatiseurs (R-410A)','kg',1924,'Quantité de gaz rechargée = fuites'),
+        L(1,'Émissions fugitives','r32','Recharge de climatiseurs (R-32)','kg',677),
+        L(1,'Émissions fugitives','r134a','Fluide R-134a (véhicules, froid)','kg',1300),
+        L(1,'Émissions fugitives','r22','Fluide R-22 (anciens équipements)','kg',1760),
+        L(1,'Procédés','procede','Émissions de procédé (valeur connue)','kgCO₂e',1,'Ex. décarbonatation, torchage'),
+        G(2,'Énergie achetée','elec','Électricité achetée au réseau','kWh',1),
+        L(2,'Énergie achetée','vapeur','Chaleur, vapeur ou froid achetés','kWh',0.20),
+        M(3,'Cat. 1 — Achats','achats_biens','Achats de biens (matières, fournitures)',500,'Ratio monétaire, ordre de grandeur'),
+        M(3,'Cat. 1 — Achats','achats_services','Achats de services',150,'Ratio monétaire, ordre de grandeur'),
+        L(3,'Cat. 1 — Achats','papier','Papier','kg',0.92),
+        L(3,'Cat. 1 — Achats','eau','Eau potable et assainissement','m³',0.40),
+        M(3,'Cat. 2 — Immobilisations','immo','Équipements (informatique, machines, véhicules)',700,'Ratio monétaire, ordre de grandeur'),
+        G(3,'Cat. 3 — Énergie amont','pertes','Pertes en ligne de l’électricité','kWh',1,'≈ 10 % de l’électricité consommée'),
+        L(3,'Cat. 4 et 9 — Transport de marchandises','fret_route','Camion','t·km',0.11,'Tonnes transportées × kilomètres'),
+        L(3,'Cat. 4 et 9 — Transport de marchandises','fret_mer','Bateau porte-conteneurs','t·km',0.012),
+        L(3,'Cat. 4 et 9 — Transport de marchandises','fret_air','Avion cargo','t·km',1.2),
+        L(3,'Cat. 5 — Déchets','dechets_decharge','Déchets mis en décharge','kg',0.60),
+        L(3,'Cat. 5 — Déchets','dechets_recycl','Déchets recyclés ou compostés','kg',0.03),
+        L(3,'Cat. 6 — Déplacements professionnels','avion_court','Avion court-courrier (< 1 000 km)','passager·km',0.258),
+        L(3,'Cat. 6 — Déplacements professionnels','avion_long','Avion long-courrier','passager·km',0.152,'Abidjan–Paris aller-retour ≈ 9 800 km'),
+        L(3,'Cat. 6 — Déplacements professionnels','voiture_pro','Voiture, taxi (location, remboursés)','km',0.21),
+        L(3,'Cat. 6 — Déplacements professionnels','hotel','Nuitées d’hôtel','nuit',20),
+        L(3,'Cat. 7 — Trajets domicile-travail','dt_voiture','Voiture','km',0.21,'Total annuel de tous les salariés'),
+        L(3,'Cat. 7 — Trajets domicile-travail','dt_moto','Moto, taxi-moto','km',0.09),
+        L(3,'Cat. 7 — Trajets domicile-travail','dt_tc','Bus, gbaka, car','passager·km',0.11),
+        L(3,'Cat. 10 à 12 — Aval','aval','Utilisation et fin de vie des produits vendus (valeur connue)','kgCO₂e',1),
+      ],
+      example:{ pop:45, cur:'XOF', qty:{ gazole_fixe:12000, gazole_veh:8000, r410a:6, elec:180000, pertes:18000,
+        achats_biens:120, achats_services:60, papier:900, avion_long:40000, voiture_pro:15000,
+        dt_moto:150000, dt_tc:200000, dechets_decharge:15000, fret_route:60000 } },
+    },
+
+    individu: {
+      label:'Individu', sub:'Personne ou ménage',
+      pop:'Personnes dans le ménage', per:'personne',
+      scopes:{
+        1:"Ce que vous brûlez vous-même : carburant de votre véhicule, gaz, charbon ou bois pour cuisiner.",
+        2:"L'électricité consommée dans votre logement.",
+        3:"Tout le reste : alimentation, achats, transports dont vous n'êtes pas le conducteur, déchets…",
+      },
+      lines:[
+        L(1,'Véhicule personnel','essence','Essence (voiture, moto)','L',2.80),
+        L(1,'Véhicule personnel','gazole','Gazole','L',3.17),
+        L(1,'Cuisine et chauffage','butane','Gaz butane','kg',3.0,'Bouteille B12 = 12,5 kg'),
+        L(1,'Cuisine et chauffage','charbon','Charbon de bois','kg',2.5,'Inclut la carbonisation en meule — très variable'),
+        L(1,'Cuisine et chauffage','bois','Bois de chauffe','kg',0.40,'Part non renouvelable + CH₄ — très variable'),
+        L(1,'Cuisine et chauffage','clim','Recharge de climatiseur (R-410A)','kg',1924),
+        G(2,'Logement','elec','Électricité','kWh',1,'Voir vos factures : total annuel'),
+        L(3,'Transports','avion_court','Avion court-courrier (< 1 000 km)','passager·km',0.258),
+        L(3,'Transports','avion_long','Avion long-courrier','passager·km',0.152,'Abidjan–Paris aller-retour ≈ 9 800 km'),
+        L(3,'Transports','taxi','Taxi, VTC, woro-woro','km',0.21),
+        L(3,'Transports','moto_taxi','Taxi-moto','km',0.09),
+        L(3,'Transports','tc','Bus, gbaka, car, train','passager·km',0.11),
+        L(3,'Alimentation (repas par an)','repas_boeuf','Repas avec bœuf ou mouton','repas',7.26),
+        L(3,'Alimentation (repas par an)','repas_poulet','Repas avec poulet ou porc','repas',1.58),
+        L(3,'Alimentation (repas par an)','repas_poisson','Repas avec poisson','repas',1.60),
+        L(3,'Alimentation (repas par an)','repas_vege','Repas végétarien','repas',0.51),
+        L(3,'Biens de consommation','smartphone','Smartphone neuf','unité',50),
+        L(3,'Biens de consommation','ordi','Ordinateur portable neuf','unité',160),
+        L(3,'Biens de consommation','tv','Téléviseur neuf','unité',250),
+        L(3,'Biens de consommation','vetements','Vêtements neufs','pièce',10),
+        M(3,'Biens de consommation','autres','Autres achats et services',300,'Ratio monétaire, ordre de grandeur'),
+        L(3,'Logement','eau','Eau potable','m³',0.40),
+        L(3,'Logement','dechets','Déchets ménagers','kg',0.60),
+      ],
+      example:{ pop:1, cur:'XOF', qty:{ essence:600, butane:75, elec:1800, avion_long:9800, taxi:1500, tc:3000,
+        repas_boeuf:100, repas_poulet:300, repas_poisson:250, repas_vege:300, smartphone:1, vetements:12,
+        eau:40, dechets:300 } },
+    },
+
+    localite: {
+      label:'Localité', sub:'Commune, ville, région',
+      pop:'Population (habitants)', per:'habitant',
+      scopes:{
+        1:"Émissions produites à l'intérieur des limites du territoire : énergie, transport, déchets traités sur place, agriculture et usage des terres.",
+        2:"Émissions liées à l'électricité du réseau consommée sur le territoire.",
+        3:"Émissions hors du territoire causées par ses activités : déchets traités ailleurs, pertes du réseau, voyages aériens des résidents.",
+      },
+      lines:[
+        L(1,'Énergie — résidentiel','charbon','Charbon de bois consommé','t',2500,'Inclut la carbonisation — très variable'),
+        L(1,'Énergie — résidentiel','bois','Bois de chauffe','t',400,'Très variable'),
+        L(1,'Énergie — résidentiel','butane','Gaz butane','t',3000),
+        L(1,'Énergie — industrie et commerce','ind_gazole','Gazole (groupes, chaudières)','m³',3170),
+        L(1,'Énergie — industrie et commerce','ind_fioul','Fioul lourd','t',3220),
+        L(1,'Énergie — industrie et commerce','ind_gaz','Gaz naturel','MWh',227),
+        L(1,'Transport routier','essence','Essence vendue sur le territoire','m³',2800),
+        L(1,'Transport routier','gazole','Gazole vendu sur le territoire','m³',3170),
+        L(1,'Déchets traités sur le territoire','decharge','Décharge','t',600),
+        L(1,'Déchets traités sur le territoire','brulage','Brûlage à l’air libre','t',700),
+        L(1,'Agriculture, forêt et usage des terres','bovins','Bovins','tête',900,'Fermentation entérique + fumier (GIEC niveau 1)'),
+        L(1,'Agriculture, forêt et usage des terres','petits','Ovins et caprins','tête',150),
+        L(1,'Agriculture, forêt et usage des terres','porcins','Porcins','tête',60),
+        L(1,'Agriculture, forêt et usage des terres','riz','Riziculture irriguée','ha',4000),
+        L(1,'Agriculture, forêt et usage des terres','engrais','Engrais azotés épandus','kg N',5.0),
+        L(1,'Agriculture, forêt et usage des terres','deforest','Défrichement de forêt','ha',400000,'Très variable selon le type de forêt'),
+        G(2,'Électricité','elec','Électricité du réseau consommée','MWh',1000),
+        G(3,'Électricité','pertes','Pertes de transport et distribution','MWh',1000),
+        L(3,'Hors territoire','dechets_ext','Déchets traités hors du territoire','t',600),
+        L(3,'Hors territoire','vols','Voyages aériens des résidents','passager·km',0.17),
+      ],
+      example:{ pop:120000, cur:'XOF', qty:{ charbon:6000, bois:9000, butane:1500, ind_gazole:2000, essence:9000,
+        gazole:14000, decharge:30000, brulage:5000, bovins:5000, petits:12000, engrais:50000, elec:90000,
+        pertes:12000, vols:15000000 } },
+    },
+
+    communaute: {
+      label:'Communauté', sub:'Village, association, école',
+      pop:'Nombre de membres', per:'membre',
+      scopes:{
+        1:"Combustions et rejets directs des installations et activités de la communauté : groupe électrogène, cuisine collective, véhicules, brûlage des déchets.",
+        2:"Électricité du réseau consommée par les locaux de la communauté.",
+        3:"Émissions indirectes : déplacements des membres, repas servis, achats, déchets éliminés par d'autres.",
+      },
+      lines:[
+        L(1,'Énergie','groupe','Gazole — groupe électrogène','L',3.17),
+        L(1,'Énergie','veh_essence','Essence — véhicules, motos','L',2.80),
+        L(1,'Énergie','veh_gazole','Gazole — véhicules','L',3.17),
+        L(1,'Cuisine collective','charbon','Charbon de bois','kg',2.5,'Très variable'),
+        L(1,'Cuisine collective','bois','Bois de chauffe','kg',0.40,'Très variable'),
+        L(1,'Cuisine collective','butane','Gaz butane','kg',3.0),
+        L(1,'Déchets et élevage','brulage','Déchets brûlés sur place','kg',0.70),
+        L(1,'Déchets et élevage','bovins','Bovins élevés','tête',900),
+        L(1,'Déchets et élevage','petits','Ovins et caprins élevés','tête',150),
+        G(2,'Électricité','elec','Électricité du réseau','kWh',1),
+        L(3,'Déplacements des membres','car','Bus, car, gbaka','passager·km',0.11),
+        L(3,'Déplacements des membres','voiture','Voiture, taxi','km',0.21),
+        L(3,'Déplacements des membres','moto','Moto, taxi-moto','km',0.09),
+        L(3,'Déplacements des membres','avion','Avion','passager·km',0.17),
+        L(3,'Repas servis','repas_viande','Repas avec bœuf ou mouton','repas',7.26),
+        L(3,'Repas servis','repas_autres','Autres repas (poulet, poisson, végétarien)','repas',1.3),
+        M(3,'Achats et ressources','achats','Matériel et fournitures',400,'Ratio monétaire, ordre de grandeur'),
+        L(3,'Achats et ressources','eau','Eau potable','m³',0.40),
+        L(3,'Achats et ressources','dechets','Déchets collectés (décharge)','kg',0.60),
+      ],
+      example:{ pop:300, cur:'XOF', qty:{ groupe:2500, veh_essence:400, charbon:4000, butane:300, brulage:5000,
+        elec:12000, car:60000, moto:8000, repas_viande:500, repas_autres:4000, achats:3, eau:600 } },
+    },
+  };
+
+  const SCOPE_NAMES = { 1:'Scope 1 — Émissions directes', 2:'Scope 2 — Énergie indirecte', 3:'Scope 3 — Autres indirectes' };
+  const SCOPE_SHORT = { 1:'Scope 1', 2:'Scope 2', 3:'Scope 3' };
+
+  // ---------- État ----------
+  const STORE = 'calculateur-scopes-v1';
+  const blankProfile = () => ({ name:'', year:new Date().getFullYear() - 1, pop:'', country:'CI', grid:0.43, cur:'XOF', qty:{}, fx:{}, custom:[] });
+  let state = { type:'entreprise', expert:false, profiles:{} };
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORE));
+    if (saved && TYPES[saved.type]) state = Object.assign(state, saved);
+  } catch (e) { /* stockage indisponible : on garde l'état vide */ }
+
+  const save = () => { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) {} };
+  const prof = () => {
+    if (!state.profiles[state.type]) state.profiles[state.type] = blankProfile();
+    return state.profiles[state.type];
+  };
+
+  // ---------- Calcul ----------
+  const num = v => { const n = typeof v === 'number' ? v : parseFloat(String(v ?? '').replace(',', '.')); return isFinite(n) ? n : 0; };
+  const has = v => v !== undefined && v !== null && String(v).trim() !== '' && isFinite(num(v));
+  const unitOf = (line, p) => line.money ? (p.cur === 'XOF' ? 'M FCFA' : 'k€') : line.unit;
+  const baseFactor = (line, p) => {
+    if (line.grid) return num(p.grid) * line.grid;
+    if (line.money) return p.cur === 'XOF' ? line.f * 1000 / XOF_PER_EUR : line.f;
+    return line.f;
+  };
+  const factorOf = (line, p) => has(p.fx[line.id]) ? num(p.fx[line.id]) : baseFactor(line, p);
+
+  function compute(p, type) {
+    const items = [];
+    for (const line of TYPES[type].lines) {
+      const q = num(p.qty[line.id]);
+      items.push({ id:line.id, scope:line.scope, cat:line.cat, label:line.label, unit:unitOf(line, p), qty:q, factor:factorOf(line, p), kg:q * factorOf(line, p) });
+    }
+    for (const c of p.custom) {
+      items.push({ id:c.id, scope:c.scope, cat:'Poste personnalisé', label:c.label || 'Poste personnalisé', unit:c.unit || '', qty:num(c.qty), factor:num(c.f), kg:num(c.qty) * num(c.f) });
+    }
+    const byScope = { 1:0, 2:0, 3:0 };
+    for (const it of items) byScope[it.scope] += it.kg;
+    return { items, byScope, total: byScope[1] + byScope[2] + byScope[3] };
+  }
+
+  // ---------- Formatage ----------
+  const nf = d => new Intl.NumberFormat('fr-FR', { maximumFractionDigits:d, minimumFractionDigits:0 });
+  const fmtNum = (n, d = 2) => nf(Math.abs(n) >= 100 ? 0 : d).format(n);
+  function mass(kg) {
+    if (Math.abs(kg) >= 1e6) return [nf(1).format(kg / 1e6), 'kt CO₂e'];
+    if (Math.abs(kg) >= 1000) return [nf(kg >= 1e5 ? 0 : 2).format(kg / 1000), 't CO₂e'];
+    return [nf(kg >= 10 ? 0 : 1).format(kg), 'kg CO₂e'];
+  }
+  const massStr = kg => mass(kg).join(' ');
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+
+  // ---------- Rendu ----------
+  const $ = id => document.getElementById(id);
+  const form = $('form');
+
+  function renderTabs() {
+    $('tabs').innerHTML = Object.entries(TYPES).map(([k, t]) =>
+      `<button type="button" class="tab" role="radio" data-type="${k}" aria-checked="${k === state.type}" tabindex="${k === state.type ? 0 : -1}">
+        <b>${t.label}</b><span>${t.sub}</span></button>`).join('');
+  }
+
+  function renderSettings() {
+    const p = prof(), t = TYPES[state.type];
+    $('f-name').value = p.name;
+    $('f-name').placeholder = { entreprise:'Ex. Société ABC', individu:'Ex. Mon foyer', localite:'Ex. Commune de Marcory', communaute:'Ex. Village de …' }[state.type];
+    $('f-year').value = p.year;
+    $('f-pop-label').textContent = t.pop;
+    $('f-pop').value = p.pop;
+    $('f-country').innerHTML = GRIDS.map(g => `<option value="${g.id}"${g.id === p.country ? ' selected' : ''}>${g.label}${g.f !== null ? ` — ${String(g.f).replace('.', ',')}` : ''}</option>`).join('');
+    $('f-grid').value = p.grid;
+    $('f-grid').readOnly = p.country !== 'XX';
+    $('f-cur').value = p.cur;
+    $('f-expert').checked = !!state.expert;
+  }
+
+  function factorCell(line, p) {
+    const u = unitOf(line, p);
+    const unitTxt = `kg/${u}`;
+    if (state.expert) {
+      const ph = fmtNum(baseFactor(line, p), 4);
+      const v = has(p.fx[line.id]) ? p.fx[line.id] : '';
+      return `<div class="fac"><span aria-hidden="true">×</span><input type="number" step="any" data-fx="${line.id}" value="${esc(v)}" placeholder="${ph}" aria-label="Facteur d'émission — ${esc(line.label)}" /><span class="unit">${esc(unitTxt)}</span></div>`;
+    }
+    return `<div class="fac"><span class="val">× ${fmtNum(factorOf(line, p), 4)}</span><span class="unit">${esc(unitTxt)}</span></div>`;
+  }
+
+  function renderForm() {
+    const p = prof(), t = TYPES[state.type];
+    let html = '';
+    for (const s of [1, 2, 3]) {
+      html += `<section class="panel scope" style="--c:var(--s${s})" aria-labelledby="h-s${s}">
+        <div class="scope-head"><h2 id="h-s${s}"><span>${SCOPE_NAMES[s]}</span><span class="sum" data-sum="${s}"></span></h2><p>${t.scopes[s]}</p></div>`;
+      let cat = null;
+      for (const line of t.lines.filter(l => l.scope === s)) {
+        if (line.cat !== cat) { cat = line.cat; html += `<div class="cat">${esc(cat)}</div>`; }
+        const v = has(p.qty[line.id]) ? p.qty[line.id] : '';
+        html += `<div class="row" data-row="${line.id}">
+          <label for="q-${line.id}"><span class="lbl">${esc(line.label)}</span>${line.hint ? `<span class="hint">${esc(line.hint)}</span>` : ''}</label>
+          <div class="qty"><input id="q-${line.id}" type="number" min="0" step="any" inputmode="decimal" data-q="${line.id}" value="${esc(v)}" /><span class="unit">${esc(unitOf(line, p))}</span></div>
+          ${factorCell(line, p)}
+          <output class="res" data-res="${line.id}"></output>
+        </div>`;
+      }
+      const customs = p.custom.filter(c => c.scope === s);
+      if (customs.length) html += `<div class="cat">Postes personnalisés</div>`;
+      for (const c of customs) {
+        html += `<div class="row custom" data-row="${c.id}">
+          <div class="lbl-in"><input type="text" data-c="${c.id}" data-k="label" value="${esc(c.label)}" placeholder="Intitulé du poste" aria-label="Intitulé" /><input class="u" type="text" data-c="${c.id}" data-k="unit" value="${esc(c.unit)}" placeholder="unité" aria-label="Unité" /></div>
+          <div class="qty"><input type="number" min="0" step="any" inputmode="decimal" data-c="${c.id}" data-k="qty" value="${esc(c.qty)}" aria-label="Quantité" /></div>
+          <div class="fac"><span aria-hidden="true">×</span><input type="number" step="any" data-c="${c.id}" data-k="f" value="${esc(c.f)}" placeholder="facteur" aria-label="Facteur d'émission (kgCO₂e par unité)" /><span class="unit">kg/u</span></div>
+          <div class="res"><output data-res="${c.id}"></output> <button type="button" class="del" data-del="${c.id}" aria-label="Supprimer ce poste" title="Supprimer">×</button></div>
+        </div>`;
+      }
+      html += `<div class="add-row"><button type="button" class="btn" data-add="${s}">+ Ajouter un poste au scope ${s}</button></div></section>`;
+    }
+    form.innerHTML = html;
+  }
+
+  function renderResults() {
+    const p = prof(), t = TYPES[state.type];
+    const r = compute(p, state.type);
+
+    for (const it of r.items) {
+      const el = form.querySelector(`[data-res="${it.id}"]`);
+      if (!el) continue;
+      el.textContent = it.kg ? massStr(it.kg) : '—';
+      el.classList.toggle('zero', !it.kg);
+      el.closest('.row')?.classList.toggle('empty-row', !it.kg);
+    }
+    // Facteurs dépendant du réseau ou de la devise (mode lecture)
+    if (!state.expert) {
+      for (const line of t.lines) {
+        const v = form.querySelector(`[data-row="${line.id}"] .fac .val`);
+        if (v) v.textContent = `× ${fmtNum(factorOf(line, p), 4)}`;
+      }
+    }
+    for (const s of [1, 2, 3]) {
+      const el = form.querySelector(`[data-sum="${s}"]`);
+      if (el) el.textContent = r.byScope[s] ? massStr(r.byScope[s]) : '';
+    }
+
+    const [v, u] = mass(r.total);
+    $('r-title').textContent = `Total ${p.year || ''}${p.name ? ' · ' + p.name : ''}`;
+    $('r-total').innerHTML = `${v}<small>${u}</small>`;
+    const pop = num(p.pop);
+    $('r-int').innerHTML = pop > 0 && r.total > 0
+      ? `soit <b>${massStr(r.total / pop)}</b> par ${t.per}`
+      : (r.total > 0 ? `Renseignez « ${t.pop.toLowerCase()} » pour obtenir l'intensité par ${t.per}.` : 'Saisissez au moins une donnée d’activité.');
+
+    const tot = r.total || 1;
+    $('r-bar').innerHTML = [1, 2, 3].map(s => `<span style="width:${(r.byScope[s] / tot * 100).toFixed(2)}%;background:var(--s${s})"></span>`).join('');
+    $('r-legend').innerHTML = [1, 2, 3].map(s => `<li><span class="dot" style="background:var(--s${s})"></span><span>${SCOPE_SHORT[s]}</span>
+      <span class="v">${massStr(r.byScope[s])}</span><span class="p">${r.total ? Math.round(r.byScope[s] / tot * 100) : 0}&nbsp;%</span></li>`).join('');
+
+    const top = r.items.filter(i => i.kg > 0).sort((a, b) => b.kg - a.kg).slice(0, 6);
+    $('r-top').innerHTML = top.length
+      ? top.map(i => `<li><div class="t"><span>${esc(i.label)}</span><span>${massStr(i.kg)}</span></div>
+          <div class="m"><i style="width:${(i.kg / top[0].kg * 100).toFixed(1)}%;background:var(--s${i.scope})"></i></div></li>`).join('')
+      : '<li class="empty">Aucun poste renseigné pour l’instant.</li>';
+
+    const bench = $('r-bench');
+    const perCap = pop > 0 ? r.total / pop : (state.type === 'individu' ? r.total : 0);
+    if ((state.type === 'individu' || state.type === 'localite' || state.type === 'communaute') && perCap > 0) {
+      const ratio = perCap / 2000;
+      bench.hidden = false;
+      bench.innerHTML = `Repère : l’objectif compatible avec l’Accord de Paris est d’environ <b>2 t CO₂e par personne et par an</b>.
+        Ici : <b>${massStr(perCap)}</b> par ${t.per}, soit ${ratio >= 1 ? `<b>${nf(1).format(ratio)} ×</b> cet objectif` : `<b>${Math.round(ratio * 100)} %</b> de cet objectif`}.`;
+    } else {
+      bench.hidden = true;
+    }
+  }
+
+  function renderAll() { renderTabs(); renderSettings(); renderForm(); renderResults(); }
+
+  // ---------- Événements ----------
+  $('tabs').addEventListener('click', e => {
+    const b = e.target.closest('[data-type]');
+    if (!b || b.dataset.type === state.type) return;
+    state.type = b.dataset.type; save(); renderAll();
+    $('tabs').querySelector(`[data-type="${state.type}"]`).focus();
+  });
+  $('tabs').addEventListener('keydown', e => {
+    if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
+    const keys = Object.keys(TYPES);
+    const d = (e.key === 'ArrowLeft' || e.key === 'ArrowUp') ? -1 : 1;
+    state.type = keys[(keys.indexOf(state.type) + d + keys.length) % keys.length];
+    e.preventDefault(); save(); renderAll();
+    $('tabs').querySelector(`[data-type="${state.type}"]`).focus();
+  });
+
+  $('f-name').addEventListener('input', e => { prof().name = e.target.value; save(); renderResults(); });
+  $('f-year').addEventListener('input', e => { prof().year = e.target.value; save(); renderResults(); });
+  $('f-pop').addEventListener('input', e => { prof().pop = e.target.value; save(); renderResults(); });
+  $('f-country').addEventListener('change', e => {
+    const p = prof(), g = GRIDS.find(x => x.id === e.target.value);
+    p.country = g.id;
+    if (g.f !== null) p.grid = g.f;
+    save(); renderSettings(); renderForm(); renderResults();
+    if (g.f === null) $('f-grid').focus();
+  });
+  $('f-grid').addEventListener('input', e => { prof().grid = e.target.value; save(); renderResults(); });
+  $('f-cur').addEventListener('change', e => { prof().cur = e.target.value; save(); renderForm(); renderResults(); });
+  $('f-expert').addEventListener('change', e => { state.expert = e.target.checked; save(); renderForm(); renderResults(); });
+
+  form.addEventListener('input', e => {
+    const el = e.target, p = prof();
+    if (el.dataset.q) {
+      if (el.value === '') delete p.qty[el.dataset.q]; else p.qty[el.dataset.q] = el.value;
+    } else if (el.dataset.fx) {
+      if (el.value === '') delete p.fx[el.dataset.fx]; else p.fx[el.dataset.fx] = el.value;
+    } else if (el.dataset.c) {
+      const c = p.custom.find(x => x.id === el.dataset.c);
+      if (c) c[el.dataset.k] = el.value;
+    } else return;
+    save(); renderResults();
+  });
+  form.addEventListener('click', e => {
+    const add = e.target.closest('[data-add]');
+    const del = e.target.closest('[data-del]');
+    const p = prof();
+    if (add) {
+      const id = 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      p.custom.push({ id, scope:+add.dataset.add, label:'', unit:'', qty:'', f:'' });
+      save(); renderForm(); renderResults();
+      form.querySelector(`[data-c="${id}"]`).focus();
+    } else if (del) {
+      p.custom = p.custom.filter(c => c.id !== del.dataset.del);
+      save(); renderForm(); renderResults();
+    }
+  });
+
+  $('b-example').addEventListener('click', () => {
+    const p = prof(), ex = TYPES[state.type].example;
+    const hasData = Object.keys(p.qty).length || p.custom.length;
+    if (hasData && !confirm('Remplacer les données saisies par un exemple ?')) return;
+    p.qty = Object.fromEntries(Object.entries(ex.qty).map(([k, v]) => [k, String(v)]));
+    p.pop = ex.pop; p.cur = ex.cur; p.custom = []; p.fx = {};
+    if (!p.name) p.name = 'Exemple';
+    save(); renderAll();
+  });
+  $('b-reset').addEventListener('click', () => {
+    if (!confirm(`Effacer toutes les données du profil « ${TYPES[state.type].label} » ?`)) return;
+    state.profiles[state.type] = blankProfile(); save(); renderAll();
+  });
+  $('b-print').addEventListener('click', () => window.print());
+
+  function download(name, text, type) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], { type }));
+    a.download = name; document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+  }
+  const slug = () => ((prof().name || TYPES[state.type].label) + '-' + (prof().year || '')).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\w-]+/g, '-').replace(/-+$/,'').toLowerCase();
+
+  $('b-csv').addEventListener('click', () => {
+    const p = prof(), r = compute(p, state.type);
+    const d = n => String(+n.toFixed(6)).replace('.', ',');
+    const q = s => `"${String(s).replace(/"/g, '""')}"`;
+    const rows = [['Scope', 'Catégorie', 'Poste', 'Quantité', 'Unité', 'Facteur (kgCO2e/unité)', 'Émissions (kgCO2e)']];
+    for (const it of r.items) if (it.qty) rows.push([it.scope, q(it.cat), q(it.label), d(it.qty), q(it.unit), d(it.factor), d(it.kg)]);
+    rows.push([]);
+    for (const s of [1, 2, 3]) rows.push([s, q('Total ' + SCOPE_SHORT[s]), '', '', '', '', d(r.byScope[s])]);
+    rows.push(['', q('Total'), '', '', '', '', d(r.total)]);
+    const head = `${q('Entité')};${q(p.name)}\n${q('Type')};${q(TYPES[state.type].label)}\n${q('Année')};${q(p.year)}\n${q('Facteur électricité (kgCO2e/kWh)')};${d(num(p.grid))}\n\n`;
+    download(`bilan-ges-${slug()}.csv`, '﻿' + head + rows.map(r => r.join(';')).join('\n'), 'text/csv;charset=utf-8');
+  });
+  $('b-json').addEventListener('click', () => {
+    download(`bilan-ges-${slug()}.json`, JSON.stringify({ app:'calculateur-scopes', version:1, type:state.type, profile:prof() }, null, 2), 'application/json');
+  });
+  $('b-import').addEventListener('click', () => $('f-file').click());
+  $('f-file').addEventListener('change', async e => {
+    const file = e.target.files[0]; e.target.value = '';
+    if (!file) return;
+    try {
+      const data = JSON.parse(await file.text());
+      if (data.app !== 'calculateur-scopes' || !TYPES[data.type] || typeof data.profile !== 'object') throw new Error('format');
+      state.type = data.type;
+      state.profiles[data.type] = Object.assign(blankProfile(), data.profile);
+      save(); renderAll();
+    } catch (err) {
+      alert('Fichier non reconnu : importez un fichier .json enregistré depuis ce calculateur.');
+    }
+  });
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
