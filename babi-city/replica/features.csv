@@ -1,0 +1,74 @@
+feature,area,priority,original,clone,notes
+Monde ouvert libre avec quartiers distincts,monde,must,yes,yes,Adjamé Plateau Cocody Banco lagune
+Cycle jour/nuit,monde,should,yes,yes,
+Météo (pluie orage),monde,could,yes,no,
+Piétons qui marchent et réagissent (fuite),monde,must,yes,yes,
+Circulation IA sur graphe routier,monde,must,yes,yes,
+Zones fermées qui s'ouvrent avec l'histoire,monde,could,yes,partial,pont vers Treichville fermé sans déblocage
+Trois protagonistes jouables,personnages,must,yes,yes,Koffi Bakary Séry
+Changement de personnage avec vue satellite,personnages,must,yes,yes,
+Héros qui vivent leur vie quand on les quitte,personnages,could,yes,no,ils restent à leur dernière position
+Argent séparé par personnage,personnages,must,yes,yes,FCFA
+Capacités spéciales et jauge,personnages,should,yes,no,ralenti tir / ralenti conduite / rage
+Compétences qui progressent à l'usage,personnages,could,yes,no,
+Vue troisième personne,caméra,must,yes,yes,
+Vue première personne,caméra,could,yes,no,
+Courir sauter,à pied,must,yes,yes,
+Nager,à pied,should,yes,no,l'eau bloque le joueur
+Escalader,à pied,could,yes,no,
+Santé qui se régénère jusqu'à la moitié,à pied,must,yes,yes,
+Armure,à pied,should,yes,yes,ramassable
+Corps à corps,combat,must,yes,yes,
+Armes à feu avec visée et réticule,combat,must,yes,yes,pistolet seulement
+Plusieurs catégories d'armes,combat,should,yes,no,
+Roue des armes,combat,should,yes,no,touche X alterne poings/pistolet
+Explosifs (grenades),combat,should,yes,no,
+Système de couverture,combat,should,yes,no,
+Ennemis à pied avec IA de combat,combat,should,yes,no,seuls les policiers en voiture tirent
+Voler un véhicule en éjectant le conducteur,véhicules,must,yes,yes,
+Physique de conduite arcade et dégâts,véhicules,must,yes,yes,fumée feu explosion
+Variété de véhicules locaux,véhicules,must,yes,yes,gbaka woro-woro taxi 4x4 sportive police fourgon
+Motos,véhicules,should,yes,no,
+Bateaux,véhicules,could,yes,no,pirogues décoratives seulement
+Avions et hélicoptères,véhicules,could,yes,no,
+Radio en voiture avec stations,véhicules,must,yes,yes,3 stations générées
+Klaxon,véhicules,could,yes,yes,
+Niveau de recherche 1 à 5 étoiles,police,must,yes,yes,
+Zone de recherche et étoiles clignotantes,police,must,yes,yes,cercle sur la minimap
+Police qui tire à partir de 2 étoiles,police,must,yes,yes,
+Barrages routiers,police,should,yes,no,
+Hélicoptère de police,police,should,yes,no,
+Policiers à pied,police,should,yes,no,
+Cône de vision des policiers,police,could,yes,partial,distance seulement sans ligne de vue
+Arrestation,police,must,yes,yes,
+Repeinture qui efface les étoiles,police,should,yes,no,
+Missions d'histoire marquées par lettre,missions,must,yes,yes,5 missions
+Cinématiques avec sous-titres,missions,must,yes,yes,
+Mission réussie / échouée avec réessai,missions,must,yes,yes,réessai depuis le début
+Points de passage en mission,missions,should,yes,no,
+Médailles et objectifs bonus,missions,could,yes,no,
+Braquage préparé en plusieurs étapes,missions,should,yes,partial,1 braquage sans préparation
+Choix de l'approche du braquage,missions,should,yes,no,
+Recrutement d'équipiers avec parts,missions,could,yes,no,
+Missions à plusieurs héros avec changement en mission,missions,should,yes,no,
+Petits boulots (taxi),activités,should,yes,yes,courses de taxi et woro-woro
+Activités annexes (sports jeux),activités,could,yes,no,
+Minimap rotative avec blips,interface,must,yes,yes,
+GPS vers objectif et point GPS,interface,must,yes,yes,
+Carte de pause avec légende,interface,must,yes,yes,
+Aide contextuelle,interface,must,yes,yes,
+Roue radio,interface,could,yes,no,touche R fait défiler
+Téléphone avec contacts et SMS,interface,should,yes,no,
+Mort et réapparition à l'hôpital,interface,must,yes,yes,
+Sauvegarde,interface,must,yes,yes,automatique localStorage
+Armurerie,économie,should,yes,no,
+Atelier de tuning et peinture,économie,should,yes,no,
+Vêtements coiffeur tatouages,économie,could,yes,no,
+Achat de propriétés avec revenus,économie,could,yes,no,
+Garage personnel,économie,could,yes,no,
+Bourse,économie,could,yes,no,
+Commandes tactiles,plateforme,could,no,yes,ajout Babi City
+Carte de Los Santos,contenu,could,yes,skip,propriété de Rockstar ; remplacée par Abidjan
+Personnages histoire dialogues de GTA V,contenu,could,yes,skip,propriété de Rockstar ; écrits originaux
+Musiques sous licence,contenu,could,yes,skip,licences ; musique générée
+GTA Online,contenu,could,yes,skip,serveurs et communauté hors périmètre
