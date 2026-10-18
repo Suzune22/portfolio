@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="description" content="Babi City : prototype de jeu en monde ouvert inspiré de GTA V, à Abidjan (Adjamé, Plateau, Cocody). Trois personnages jouables, missions, police, radios." />
+<title>Babi City</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#f5f2ea; --dim:rgba(245,242,234,.7); --gold:#f5d742; --red:#e74c3c; --blue:#4fb3ff; --green:#2ecc71;
+    --panel:rgba(10,12,14,.72); --orange:#ff7f00;
+    color-scheme: dark;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; height:100%; overflow:hidden; background:#0b0f12; color:var(--ink);
+    font-family:'Barlow Condensed','Arial Narrow',sans-serif; user-select:none; -webkit-user-select:none; touch-action:none; }
+  canvas#game{ position:fixed; inset:0; width:100%; height:100%; display:block; transition:filter .8s; }
+  canvas#game.wasted{ filter:grayscale(1) contrast(1.1) brightness(.85); }
+  kbd{ display:inline-block; min-width:1.5em; padding:0 .35em; border:1px solid rgba(255,255,255,.5); border-radius:4px;
+    background:rgba(255,255,255,.12); font:inherit; font-weight:700; text-align:center; }
+  b.y{ color:var(--gold); } b.r{ color:var(--red); } b.b{ color:var(--blue); }
+  [hidden]{ display:none !important; }
+
+  #hud{ position:fixed; inset:0; pointer-events:none; }
+  #hud.cine > :not(#subtitle):not(#letterbox):not(#bigmsg){ opacity:0; transition:opacity .4s; }
+
+  /* Haut droite : heure, argent, étoiles */
+  #topright{ position:absolute; top:16px; right:20px; text-align:right; text-shadow:0 2px 3px #000; }
+  #clock{ font-size:18px; color:var(--dim); font-weight:600; letter-spacing:.06em; }
+  #money{ font-family:'Bebas Neue',sans-serif; font-size:40px; line-height:1; color:#9ff0a8; letter-spacing:.02em; }
+  #stars{ font-size:30px; line-height:1; letter-spacing:2px; opacity:.35; }
+  #stars.active{ opacity:1; }
+  #stars i{ font-style:normal; color:rgba(255,255,255,.35); }
+  #stars i.on{ color:#fff; text-shadow:0 0 6px rgba(255,255,255,.8); }
+  #stars i.on.dim{ color:rgba(255,255,255,.45); text-shadow:none; }
+  #stars.flash{ animation:flash .2s 6; }
+  @keyframes flash{ 50%{ transform:scale(1.15); filter:brightness(2);} }
+  #weapon{ margin-top:4px; font-size:17px; font-weight:600; color:var(--dim); }
+  #weapon b{ color:#fff; }
+  #toasts{ margin-top:6px; display:flex; flex-direction:column; align-items:flex-end; gap:4px; }
+  .toast{ background:var(--panel); padding:4px 10px; border-radius:3px; font-size:17px; font-weight:600; animation:toast 3.2s forwards; }
+  @keyframes toast{ 0%{opacity:0; transform:translateX(20px);} 10%,80%{opacity:1; transform:none;} 100%{opacity:0;} }
+
+  /* Minimap bas gauche (rectangulaire, comme GTA V) */
+  #minimap-wrap{ position:absolute; left:20px; bottom:20px; width:min(270px, 44vw); pointer-events:auto; }
+  #minimap{ display:block; width:100%; aspect-ratio:16/10; border:3px solid rgba(0,0,0,.65); border-radius:4px; cursor:pointer;
+    box-shadow:0 4px 18px rgba(0,0,0,.5); background:#2b5876; }
+  #bars{ display:flex; gap:4px; margin-top:4px; }
+  .bar{ flex:1; height:8px; background:rgba(0,0,0,.6); border-radius:2px; overflow:hidden; }
+  .bar.hp{ flex:1.4; }
+  .bar i{ display:block; height:100%; width:100%; background:#55c35a; transition:width .2s; }
+  .bar i.low{ background:var(--red); animation:flash 1s infinite; }
+  .bar.ar i{ background:#3a8ee6; }
+
+  #help{ position:absolute; top:16px; left:20px; max-width:min(360px, 70vw); background:var(--panel); padding:10px 14px;
+    border-radius:4px; font-size:18px; line-height:1.35; opacity:0; transform:translateY(-8px); transition:.25s; }
+  #help.show{ opacity:1; transform:none; }
+
+  #objective{ position:absolute; left:50%; bottom:13vh; transform:translateX(-50%); max-width:min(720px, 90vw); text-align:center;
+    font-size:23px; font-weight:600; text-shadow:0 2px 4px #000, 0 0 2px #000; opacity:0; transition:.3s; }
+  #objective.show{ opacity:1; }
+  #subtitle{ position:absolute; left:50%; bottom:6.5vh; transform:translateX(-50%); width:min(820px, 92vw); text-align:center;
+    font-size:22px; font-weight:500; text-shadow:0 2px 4px #000, 0 0 2px #000; opacity:0; transition:opacity .2s; z-index:3; }
+  #subtitle.show{ opacity:1; }
+  #timer{ position:absolute; right:20px; bottom:24px; font-family:'Bebas Neue'; font-size:44px; background:var(--panel); padding:2px 14px;
+    border-radius:4px; display:none; }
+  #timer.show{ display:block; }
+  #timer.urgent{ color:var(--red); animation:flash 1s infinite; }
+
+  #areaname{ position:absolute; right:22px; bottom:84px; font-family:'Bebas Neue'; font-size:42px; letter-spacing:.03em; text-shadow:0 2px 6px #000;
+    opacity:0; transition:opacity .6s; text-align:right; }
+  #vehname{ position:absolute; right:22px; bottom:130px; font-size:24px; font-weight:700; color:var(--dim); opacity:0; transition:opacity .5s; text-shadow:0 2px 4px #000; }
+  #radioname{ position:absolute; top:18px; left:50%; transform:translateX(-50%); text-align:center; font-family:'Bebas Neue'; font-size:34px;
+    text-shadow:0 2px 6px #000; opacity:0; transition:opacity .4s; }
+  #radioname small{ display:block; font-family:'Barlow Condensed'; font-size:17px; color:var(--dim); }
+  #areaname.show,#vehname.show,#radioname.show{ opacity:1; }
+
+  #bigmsg{ position:absolute; left:0; right:0; top:34%; text-align:center; opacity:0; transition:opacity .5s; pointer-events:none; }
+  #bigmsg.show{ opacity:1; }
+  #bigmsg h1{ margin:0; font-family:'Bebas Neue'; font-weight:400; font-size:clamp(46px, 9vw, 96px); letter-spacing:.03em; text-shadow:0 4px 18px rgba(0,0,0,.8); }
+  #bigmsg p{ margin:4px auto 0; max-width:640px; padding:0 16px; font-size:22px; font-weight:600; text-shadow:0 2px 4px #000; }
+  #bigmsg.pass h1{ color:var(--gold); } #bigmsg.fail h1, #bigmsg.wasted h1{ color:var(--red); }
+  #bigmsg.wasted{ background:linear-gradient(transparent, rgba(0,0,0,.55) 30%, rgba(0,0,0,.55) 70%, transparent); padding:20px 0; }
+  #bigmsg.title h1{ font-size:clamp(38px,7vw,70px); }
+  #bigmsg.intro p{ font-size:19px; font-weight:500; }
+
+  #letterbox div{ position:absolute; left:0; right:0; height:0; background:#000; transition:height .5s; }
+  #letterbox .top{ top:0; } #letterbox .bot{ bottom:0; }
+  #letterbox.show div{ height:11vh; }
+
+  #crosshair{ position:absolute; left:50%; top:50%; width:6px; height:6px; margin:-3px 0 0 -3px; border-radius:50%; background:#fff;
+    box-shadow:0 0 0 1.5px rgba(0,0,0,.7); display:none; }
+  #crosshair.show{ display:block; }
+  #damage{ position:fixed; inset:0; pointer-events:none; box-shadow:inset 0 0 120px rgba(200,0,0,.0); }
+  #damage.hit{ animation:dmg .5s; }
+  @keyframes dmg{ 0%{ box-shadow:inset 0 0 140px rgba(220,0,0,.75);} 100%{ box-shadow:inset 0 0 120px rgba(200,0,0,0);} }
+
+  /* Roue des personnages */
+  #wheel{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); display:none; gap:16px; pointer-events:auto; }
+  #wheel.show{ display:flex; }
+  .char{ position:relative; width:150px; padding:14px 10px 12px; background:rgba(10,12,14,.85); border:3px solid transparent; border-radius:10px;
+    color:var(--ink); font:inherit; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .char.cur{ border-color:var(--c); }
+  .char:hover{ border-color:#fff; }
+  .char .k{ position:absolute; top:6px; left:8px; font-weight:800; color:var(--c); }
+  .char .face{ width:62px; height:62px; border-radius:50%; border:3px solid var(--c); position:relative; overflow:hidden; }
+  .char .face i{ position:absolute; left:0; right:0; bottom:0; height:30%; }
+  .char b{ font-family:'Bebas Neue'; font-size:28px; font-weight:400; color:var(--c); }
+  .char em{ font-style:normal; color:#9ff0a8; font-weight:600; }
+
+  /* Écrans */
+  .screen{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:16px; z-index:10; }
+  .gone{ display:none !important; }
+  #loading{ background:#0b0f12; font-size:22px; letter-spacing:.1em; flex-direction:column; text-align:center; }
+  #loading pre{ font-size:12px; white-space:pre-wrap; color:var(--dim); }
+  #title{ background:
+      radial-gradient(ellipse at 70% 20%, rgba(255,127,0,.35), transparent 55%),
+      radial-gradient(ellipse at 20% 90%, rgba(0,158,96,.35), transparent 55%),
+      linear-gradient(160deg, rgba(10,14,20,.86), rgba(10,14,20,.94)); overflow:auto; }
+  .title-card{ width:min(980px, 100%); display:grid; grid-template-columns:1.1fr 1fr; gap:28px; align-items:center; }
+  @media (max-width:760px){ .title-card{ grid-template-columns:1fr; gap:14px; } }
+  .logo{ font-family:'Bebas Neue'; font-size:clamp(70px, 14vw, 150px); line-height:.85; margin:0;
+    background:linear-gradient(180deg, #ffd27a 0%, #ff7f00 55%, #c0392b 100%); -webkit-background-clip:text; background-clip:text; color:transparent;
+    filter:drop-shadow(0 6px 0 rgba(0,0,0,.6)); }
+  .tag{ font-size:22px; font-weight:700; letter-spacing:.18em; color:#fff; margin:6px 0 16px; text-transform:uppercase; }
+  .tag span{ color:var(--orange); }
+  .pitch{ font-size:19px; line-height:1.4; color:var(--dim); margin:0 0 20px; max-width:46ch; }
+  .btns{ display:flex; gap:10px; flex-wrap:wrap; }
+  .btn{ font:inherit; font-size:22px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; padding:12px 26px; border:0; border-radius:4px;
+    cursor:pointer; background:#fff; color:#111; }
+  .btn.alt{ background:transparent; color:#fff; box-shadow:inset 0 0 0 2px rgba(255,255,255,.6); }
+  .btn:hover{ filter:brightness(.9); }
+  .trio{ display:grid; gap:10px; }
+  .who{ display:grid; grid-template-columns:56px 1fr; gap:12px; align-items:center; background:rgba(255,255,255,.06); border-left:4px solid var(--c); padding:10px 12px; border-radius:4px; }
+  .who .av{ width:56px; height:56px; border-radius:50%; border:3px solid var(--c); position:relative; overflow:hidden; }
+  .who .av i{ position:absolute; left:0; right:0; bottom:0; height:32%; }
+  .who b{ font-family:'Bebas Neue'; font-weight:400; font-size:26px; color:var(--c); display:block; line-height:1; }
+  .who p{ margin:2px 0 0; font-size:16px; color:var(--dim); line-height:1.3; }
+  .keys{ margin-top:16px; display:grid; grid-template-columns:auto 1fr; gap:4px 12px; font-size:16px; color:var(--dim); }
+  .keys dt{ color:#fff; font-weight:700; text-align:right; }
+  .keys dd{ margin:0; }
+  .disclaimer{ font-size:13px; color:rgba(255,255,255,.45); margin-top:14px; }
+  .back{ color:var(--dim); font-size:15px; }
+
+  #pause{ background:rgba(5,8,10,.7); backdrop-filter:blur(4px); display:none; }
+  #pause.show{ display:flex; }
+  .panel{ background:rgba(12,15,18,.92); border-radius:8px; padding:24px 28px; width:min(560px,100%); }
+  .panel h2{ font-family:'Bebas Neue'; font-weight:400; font-size:48px; margin:0 0 12px; }
+  .panel .btns{ flex-direction:column; }
+  .panel .btn{ width:100%; text-align:left; font-size:20px; padding:10px 18px; }
+
+  #fullmap{ position:fixed; inset:0; background:#13324a; display:none; z-index:9; pointer-events:auto; }
+  #fullmap.show{ display:block; }
+  #bigmap{ width:100%; height:100%; display:block; cursor:crosshair; }
+  #fullmap .legend{ position:absolute; left:16px; top:16px; background:var(--panel); padding:10px 14px; border-radius:6px; font-size:16px; line-height:1.5; pointer-events:none; }
+  #fullmap .legend i{ display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; }
+  #fullmap .close{ position:absolute; right:16px; top:16px; }
+
+  #credits{ background:rgba(0,0,0,.88); display:none; text-align:center; cursor:pointer; }
+  #credits.show{ display:flex; }
+  #credits h2{ font-family:'Bebas Neue'; font-weight:400; font-size:64px; margin:0; color:var(--gold); }
+  #credits p{ font-size:20px; color:var(--dim); max-width:52ch; margin:10px auto; line-height:1.4; }
+
+  /* Tactile */
+  #touch{ position:fixed; inset:0; pointer-events:none; display:none; z-index:5; }
+  #touch.show{ display:block; }
+  #stick{ position:absolute; left:22px; bottom:22px; width:130px; height:130px; border-radius:50%; background:rgba(255,255,255,.1);
+    border:2px solid rgba(255,255,255,.3); pointer-events:auto; }
+  #knob{ position:absolute; left:40px; top:40px; width:50px; height:50px; border-radius:50%; background:rgba(255,255,255,.45); }
+  #tsys{ position:absolute; right:12px; top:96px; display:flex; gap:8px; }
+  #tact{ position:absolute; right:12px; bottom:14px; display:grid; grid-template-columns:repeat(3, 62px); gap:8px; align-items:center; justify-items:center; }
+  .tb{ width:60px; height:60px; border-radius:50%; background:rgba(0,0,0,.45); border:2px solid rgba(255,255,255,.4);
+    color:#fff; font:700 14px/1.05 'Barlow Condensed',sans-serif; pointer-events:auto; display:flex; align-items:center; justify-content:center; padding:0; }
+  .tb.on{ background:rgba(255,255,255,.35); }
+  .tb.small{ width:48px; height:48px; font-size:13px; }
+  .tb.big{ width:66px; height:66px; background:rgba(192,57,43,.55); }
+  @media (pointer:coarse){
+    #minimap-wrap{ left:10px; top:10px; bottom:auto; width:min(170px, 30vw); }
+    #topright{ top:8px; right:12px; }
+    #money{ font-size:28px; } #stars{ font-size:20px; } #clock,#weapon{ font-size:14px; }
+    #help{ top:10px; left:calc(min(170px, 30vw) + 22px); max-width:36vw; font-size:14px; padding:7px 10px; }
+    #objective{ font-size:17px; bottom:auto; top:26%; max-width:60vw; }
+    #subtitle{ font-size:16px; bottom:10px; width:min(560px, 50vw); }
+    #areaname{ font-size:24px; right:auto; left:50%; transform:translateX(-50%); bottom:64px; }
+    #vehname{ display:none; }
+    #radioname{ top:36px; font-size:24px; }
+    #timer{ bottom:auto; top:40%; right:auto; left:12px; font-size:30px; }
+    #bigmsg h1{ font-size:clamp(34px, 8vw, 64px); }
+    #bigmsg p{ font-size:16px; }
+    .keys{ display:none; }
+  }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="damage"></div>
+
+<div id="hud">
+  <div id="topright">
+    <div id="clock"></div>
+    <div id="money"></div>
+    <div id="stars"></div>
+    <div id="weapon"></div>
+    <div id="toasts"></div>
+  </div>
+  <div id="help"></div>
+  <div id="radioname"></div>
+  <div id="objective"></div>
+  <div id="subtitle"></div>
+  <div id="areaname"></div>
+  <div id="vehname"></div>
+  <div id="timer"></div>
+  <div id="bigmsg"><h1></h1><p></p></div>
+  <div id="letterbox"><div class="top"></div><div class="bot"></div></div>
+  <div id="wheel"></div>
+  <div id="crosshair"></div>
+  <div id="minimap-wrap">
+    <canvas id="minimap" width="320" height="200" title="Ouvrir la carte (M)"></canvas>
+    <div id="bars"><div class="bar hp"><i id="hpbar"></i></div><div class="bar ar"><i id="arbar"></i></div></div>
+  </div>
+</div>
+
+<div id="fullmap">
+  <canvas id="bigmap"></canvas>
+  <div class="legend">
+    <div><b>Carte de Babi</b> — clique pour poser un point GPS</div>
+    <div><i style="background:#e8b730"></i>Koffi <i style="background:#4fb3ff;margin-left:10px"></i>Bakary <i style="background:#ff5a4f;margin-left:10px"></i>Séry</div>
+    <div><i style="background:#f5d742"></i>Objectif <i style="background:#e74c3c;margin-left:10px"></i>Cible <i style="background:#b469ff;margin-left:10px"></i>Point GPS</div>
+  </div>
+  <button class="btn alt close">Fermer (M)</button>
+</div>
+
+<div id="touch">
+  <div id="stick"><div id="knob"></div></div>
+  <div id="tsys">
+    <button class="tb small" data-key="Escape">Pause</button>
+    <button class="tb small" data-key="KeyM">Carte</button>
+    <button class="tb small" data-key="KeyC">Perso</button>
+  </div>
+  <div id="tact">
+    <button class="tb small" data-key="KeyJ">Course</button>
+    <button class="tb small" data-key="KeyR">Radio</button>
+    <button class="tb" data-key="KeyF">Monter</button>
+    <button class="tb small" data-key="KeyX">Arme</button>
+    <button class="tb big" data-key="Mouse0">Tir</button>
+    <button class="tb" data-key="Space">Frein<br>Saut</button>
+  </div>
+</div>
+
+<div id="pause" class="screen">
+  <div class="panel">
+    <h2>Pause</h2>
+    <div class="btns">
+      <button class="btn" id="btn-resume">Reprendre</button>
+      <button class="btn alt" id="btn-map">Carte de Babi</button>
+      <button class="btn alt" id="btn-abort" hidden>Abandonner la mission</button>
+      <button class="btn alt" id="btn-sound">Couper le son</button>
+      <button class="btn alt" id="btn-restart">Nouvelle partie</button>
+    </div>
+    <dl class="keys">
+      <dt>ZQSD / WASD / flèches</dt><dd>Marcher, conduire</dd>
+      <dt>Souris</dt><dd>Caméra · clic gauche : tirer · clic droit : viser</dd>
+      <dt>Maj</dt><dd>Courir</dd>
+      <dt>Espace</dt><dd>Sauter · frein à main</dd>
+      <dt>F</dt><dd>Monter / descendre / braquer un véhicule</dd>
+      <dt>1 · 2 · 3 (Tab)</dt><dd>Changer de personnage : Koffi, Bakary, Séry</dd>
+      <dt>R · H · J</dt><dd>Radio · klaxon · course de taxi</dd>
+      <dt>X · M · Échap</dt><dd>Arme · carte · pause</dd>
+    </dl>
+  </div>
+</div>
+
+<div id="credits" class="screen">
+  <div>
+    <h2>À suivre…</h2>
+    <p>Tu as terminé l'histoire du prototype <b>Babi City</b>. Le monde reste ouvert : continue à explorer Adjamé, le Plateau et Cocody, fais des courses en woro-woro ou provoque la police.</p>
+    <p>Clique pour continuer.</p>
+  </div>
+</div>
+
+<div id="title" class="screen">
+  <div class="title-card">
+    <div>
+      <h1 class="logo">Babi City</h1>
+      <div class="tag">Adjamé <span>·</span> Plateau <span>·</span> Cocody</div>
+      <p class="pitch">Un monde ouvert à Abidjan, inspiré de GTA V. Trois vies qui se croisent, une ville qui ne dort jamais, et un fourgon blindé qui remonte le boulevard chaque jeudi.</p>
+      <div class="btns">
+        <button class="btn" id="btn-continue" hidden>Continuer</button>
+        <button class="btn" id="btn-new">Nouvelle partie</button>
+      </div>
+      <dl class="keys">
+        <dt>ZQSD / WASD</dt><dd>Se déplacer, conduire</dd>
+        <dt>Souris</dt><dd>Caméra, viser (clic droit), tirer (clic gauche)</dd>
+        <dt>F</dt><dd>Monter / braquer un véhicule</dd>
+        <dt>1 · 2 · 3</dt><dd>Changer de personnage</dd>
+        <dt>M · R · Échap</dt><dd>Carte · radio · pause</dd>
+      </dl>
+      <p class="disclaimer">Prototype non officiel, sans lien avec Rockstar Games. Personnages, marques et événements fictifs. <a class="back" href="../">← Retour au portfolio</a></p>
+    </div>
+    <div class="trio">
+      <div class="who" style="--c:#e8b730"><span class="av" style="background:#4a2c1d"><i style="background:#e8b730"></i></span><div><b>Koffi</b><p>Ex-« homme d'affaires » rangé à Cocody. Sa famille lui coûte plus cher que ses anciens coups.</p></div></div>
+      <div class="who" style="--c:#4fb3ff"><span class="av" style="background:#5a3825"><i style="background:#ff7f00"></i></span><div><b>Bakary</b><p>Chauffeur de gbaka à Adjamé. Fait les recouvrements du garage Moussa, rêve de plus grand.</p></div></div>
+      <div class="who" style="--c:#ff5a4f"><span class="av" style="background:#2e1a12"><i style="background:#4b5320"></i></span><div><b>Séry</b><p>Imprévisible, il vit au bord du Banco. Quand il se fâche, tout Adjamé l'entend.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<div id="loading" class="screen">Chargement de Babi…</div>
+
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+</script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
