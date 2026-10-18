@@ -4,6 +4,9 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="description" content="Calculateur des émissions de gaz à effet de serre (scopes 1, 2 et 3) pour une entreprise, un individu, une localité ou une communauté." />
+<meta property="og:title" content="Calculateur d'empreinte carbone — scopes 1, 2 et 3" />
+<meta property="og:description" content="Questionnaire rapide pour estimer l'empreinte carbone d'une personne, d'un foyer ou d'une communauté, et calcul détaillé pour les entreprises et localités." />
+<meta property="og:type" content="website" />
 <title>Calculateur de scopes</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
@@ -60,9 +63,81 @@
   header.intro h1{ font-size:clamp(1.9rem,5vw,2.6rem); line-height:1.08; margin-top:8px; }
   header.intro p{ color:var(--muted); max-width:70ch; margin:12px 0 0; }
 
+  /* ---- mode switch ---- */
+  .modes{ display:inline-flex; gap:4px; padding:4px; border:1px solid var(--line); border-radius:10px; background:var(--surface); margin-bottom:22px; flex-wrap:wrap; }
+  .modes button{
+    font:inherit; font-size:14px; font-weight:600; cursor:pointer; border:none; border-radius:7px;
+    padding:9px 16px; background:transparent; color:var(--muted);
+  }
+  .modes button[aria-pressed="true"]{ background:var(--accent); color:var(--accent-ink); }
+  .modes button:not([aria-pressed="true"]):hover{ color:var(--accent); }
+
+  /* ---- questionnaire ---- */
+  .quiz{ max-width:720px; padding:24px 26px 26px; }
+  @media (max-width:560px){ .quiz{ padding:18px 16px 20px; } }
+  .quiz h2{ font-size:clamp(1.3rem,4vw,1.6rem); line-height:1.2; }
+  .quiz .help{ color:var(--muted); font-size:14px; margin:8px 0 0; }
+  .progress{ height:6px; border-radius:3px; background:color-mix(in srgb, var(--line) 70%, transparent); overflow:hidden; }
+  .progress span{ display:block; height:100%; background:var(--accent); transition:width .25s ease; }
+  .step-count{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--muted); margin:10px 0 14px; letter-spacing:.04em; }
+  .options{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:20px; }
+  .options.one{ grid-template-columns:1fr; }
+  @media (max-width:560px){ .options{ grid-template-columns:1fr; } }
+  .opt{
+    font:inherit; text-align:left; cursor:pointer; color:var(--ink); min-height:52px;
+    background:var(--bg); border:1px solid var(--line); border-radius:9px; padding:12px 14px;
+    display:flex; align-items:center; gap:12px; transition:border-color .15s ease;
+  }
+  .opt:hover{ border-color:var(--accent); }
+  .opt[aria-checked="true"]{ border-color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent); background:color-mix(in srgb, var(--accent) 10%, var(--surface)); }
+  .opt .ico{ font-size:22px; line-height:1; flex:none; width:28px; text-align:center; }
+  .opt b{ display:block; font-weight:600; font-size:15px; }
+  .opt small{ display:block; color:var(--muted); font-size:12.5px; margin-top:2px; }
+  .opt .box{ width:18px; height:18px; flex:none; border:1.5px solid var(--muted); border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:13px; color:var(--accent-ink); }
+  .opt[aria-checked="true"] .box{ background:var(--accent); border-color:var(--accent); }
+  .stepper{ display:flex; align-items:center; gap:10px; margin-top:20px; flex-wrap:wrap; }
+  .stepper button{ font:inherit; font-size:22px; width:48px; height:48px; border-radius:9px; border:1px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; }
+  .stepper button:hover{ border-color:var(--accent); color:var(--accent); }
+  .stepper input{ width:120px; height:48px; text-align:center; font-size:20px; }
+  .stepper .unit{ color:var(--muted); font-size:14px; }
+  .fields{ display:grid; gap:14px; margin-top:20px; }
+  .fields label{ display:block; font-size:14px; font-weight:600; margin-bottom:4px; }
+  .fields .stepper{ margin-top:0; }
+  .quiz-nav{ display:flex; justify-content:space-between; gap:10px; margin-top:26px; }
+  .quiz-nav .btn{ padding:10px 18px; font-size:14px; }
+  .btn:disabled{ opacity:.45; cursor:not-allowed; }
+
+  .who{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:20px; }
+  @media (max-width:640px){ .who{ grid-template-columns:1fr; } }
+  .who .opt{ flex-direction:column; align-items:flex-start; padding:16px; min-height:0; }
+  .who .opt .ico{ font-size:28px; width:auto; }
+  .who .opt b{ font-family:'Fraunces',serif; font-size:1.12rem; }
+  .resume{ margin-top:18px; padding:12px 14px; border-radius:9px; border:1px dashed var(--accent); display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap; font-size:14px; }
+
+  .res-total{ font-family:'Fraunces',serif; font-size:clamp(2.6rem,9vw,3.6rem); font-weight:600; line-height:1; margin-top:10px; }
+  .res-total small{ font-family:'Public Sans',sans-serif; font-size:1rem; font-weight:500; color:var(--muted); margin-left:6px; }
+  .res-sub{ color:var(--muted); margin-top:8px; }
+  .res-sub b{ color:var(--ink); }
+  .quiz h3{ font-size:1.05rem; margin:26px 0 12px; }
+  .gauge{ margin-top:18px; }
+  .gauge .track{ position:relative; height:10px; border-radius:5px; background:linear-gradient(90deg, var(--s3), var(--s2) 50%, var(--s1)); }
+  .gauge .mark{ position:absolute; top:-5px; width:4px; height:20px; border-radius:2px; background:var(--ink); transform:translateX(-2px); }
+  .gauge .scale{ display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted); margin-top:6px; }
+  .themes{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:11px; }
+  .themes .t{ display:flex; justify-content:space-between; gap:8px; font-size:14px; }
+  .themes .t span:last-child{ font-family:'IBM Plex Mono',monospace; font-size:12.5px; white-space:nowrap; }
+  .themes .m{ height:7px; border-radius:4px; margin-top:4px; background:color-mix(in srgb, var(--line) 60%, transparent); overflow:hidden; }
+  .themes .m i{ display:block; height:100%; background:var(--accent); }
+  .tips{ margin:0; padding-left:20px; }
+  .tips li{ margin-block:8px; }
+  .tips li::marker{ color:var(--accent); }
+  .res-actions{ display:flex; flex-wrap:wrap; gap:8px; margin-top:24px; }
+  .res-actions .btn{ padding:9px 14px; }
+  .disclaimer{ font-size:12.5px; color:var(--muted); margin-top:18px; }
+
   /* ---- type tabs ---- */
-  .tabs{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:18px; }
-  @media (max-width:720px){ .tabs{ grid-template-columns:1fr 1fr; } }
+  .tabs{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:18px; }
+  @media (max-width:520px){ .tabs{ grid-template-columns:1fr 1fr; } }
   .tab{
     font:inherit; text-align:left; cursor:pointer; color:var(--ink);
     background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:12px 14px;
@@ -177,7 +252,7 @@
 
   @media print{
     body{ background:#fff; color:#000; padding:0; }
-    nav.top, .tabs, .toolbar, .add-row, .del, details.method, .row.empty-row, .cat.empty-cat{ display:none !important; }
+    nav.top, .modes, .quiz-nav, .res-actions, .tabs, .toolbar, .add-row, .del, details.method, .row.empty-row, .cat.empty-cat{ display:none !important; }
     .layout{ grid-template-columns:1fr; }
     .results{ position:static; order:-1; }
     .panel{ break-inside:avoid; border-color:#ccc; }
@@ -196,11 +271,19 @@
 <header class="intro">
   <div class="kicker">Scopes 1 · 2 · 3</div>
   <h1>Calculateur d'émissions de gaz à effet de serre</h1>
-  <p>Choisissez le type d'entité, saisissez vos données d'activité (litres de carburant, kWh, kilomètres, tonnes de déchets…) :
-  l'outil applique un facteur d'émission à chaque poste et répartit le résultat entre les trois scopes.
-  Les données restent dans votre navigateur.</p>
+  <p>Estimez l'empreinte carbone d'une personne, d'un foyer, d'une communauté, d'une entreprise ou d'une localité.
+  Le questionnaire rapide se remplit en quelques minutes, sans chiffres précis ; le calcul détaillé permet de saisir vos données réelles poste par poste.
+  Gratuit, sans inscription : vos réponses restent dans votre navigateur.</p>
 </header>
 
+<div class="modes" role="group" aria-label="Mode de calcul">
+  <button type="button" data-mode="quiz">Questionnaire rapide</button>
+  <button type="button" data-mode="detail">Calcul détaillé</button>
+</div>
+
+<div id="quiz-view"></div>
+
+<div id="detail-view">
 <div class="tabs" role="radiogroup" aria-label="Type d'entité" id="tabs"></div>
 
 <div class="panel">
@@ -265,6 +348,7 @@
       <ul class="top-list" id="r-top"></ul>
     </div>
   </aside>
+</div>
 </div>
 
 <details class="method">
@@ -363,8 +447,8 @@
     },
 
     individu: {
-      label:'Individu', sub:'Personne ou ménage',
-      pop:'Personnes dans le ménage', per:'personne',
+      label:'Individu', sub:'Une personne',
+      pop:'Nombre de personnes', per:'personne',
       scopes:{
         1:"Ce que vous brûlez vous-même : carburant de votre véhicule, gaz, charbon ou bois pour cuisiner.",
         2:"L'électricité consommée dans votre logement.",
@@ -393,7 +477,8 @@
         L(3,'Biens de consommation','vetements','Vêtements neufs','pièce',10),
         M(3,'Biens de consommation','autres','Autres achats et services',300,'Ratio monétaire, ordre de grandeur'),
         L(3,'Logement','eau','Eau potable','m³',0.40),
-        L(3,'Logement','dechets','Déchets ménagers','kg',0.60),
+        L(3,'Logement','dechets','Déchets ménagers (collectés)','kg',0.60),
+        L(1,'Déchets','brulage','Déchets brûlés à la maison','kg',0.70),
       ],
       example:{ pop:1, cur:'XOF', qty:{ essence:600, butane:75, elec:1800, avion_long:9800, taxi:1500, tc:3000,
         repas_boeuf:100, repas_poulet:300, repas_poisson:250, repas_vege:300, smartphone:1, vetements:12,
@@ -469,13 +554,27 @@
     },
   };
 
+  TYPES.foyer = Object.assign({}, TYPES.individu, {
+    label:'Foyer', sub:'Ménage, famille',
+    pop:'Personnes dans le foyer',
+    scopes:{
+      1:"Ce que le foyer brûle lui-même : carburant des véhicules, gaz, charbon ou bois pour cuisiner, déchets brûlés.",
+      2:"L'électricité consommée dans le logement.",
+      3:"Tout le reste : alimentation, achats, transports en commun et taxis, voyages en avion, déchets collectés…",
+    },
+    example:{ pop:5, cur:'XOF', qty:{ essence:900, butane:150, charbon:360, elec:3600, avion_court:3000, tc:15000,
+      moto_taxi:3000, repas_boeuf:260, repas_poulet:650, repas_poisson:900, repas_vege:1840, smartphone:2,
+      ordi:1, vetements:50, dechets:900 } },
+  });
+  const TAB_ORDER = ['individu', 'foyer', 'communaute', 'entreprise', 'localite'];
+
   const SCOPE_NAMES = { 1:'Scope 1 — Émissions directes', 2:'Scope 2 — Énergie indirecte', 3:'Scope 3 — Autres indirectes' };
   const SCOPE_SHORT = { 1:'Scope 1', 2:'Scope 2', 3:'Scope 3' };
 
   // ---------- État ----------
   const STORE = 'calculateur-scopes-v1';
   const blankProfile = () => ({ name:'', year:new Date().getFullYear() - 1, pop:'', country:'CI', grid:0.43, cur:'XOF', qty:{}, fx:{}, custom:[] });
-  let state = { type:'entreprise', expert:false, profiles:{} };
+  let state = { type:'individu', mode:'quiz', expert:false, profiles:{}, quiz:{ view:'start', who:null, step:0, answers:{} } };
   try {
     const saved = JSON.parse(localStorage.getItem(STORE));
     if (saved && TYPES[saved.type]) state = Object.assign(state, saved);
@@ -528,7 +627,7 @@
   const form = $('form');
 
   function renderTabs() {
-    $('tabs').innerHTML = Object.entries(TYPES).map(([k, t]) =>
+    $('tabs').innerHTML = TAB_ORDER.map(k => [k, TYPES[k]]).map(([k, t]) =>
       `<button type="button" class="tab" role="radio" data-type="${k}" aria-checked="${k === state.type}" tabindex="${k === state.type ? 0 : -1}">
         <b>${t.label}</b><span>${t.sub}</span></button>`).join('');
   }
@@ -655,7 +754,7 @@
   });
   $('tabs').addEventListener('keydown', e => {
     if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
-    const keys = Object.keys(TYPES);
+    const keys = TAB_ORDER;
     const d = (e.key === 'ArrowLeft' || e.key === 'ArrowUp') ? -1 : 1;
     state.type = keys[(keys.indexOf(state.type) + d + keys.length) % keys.length];
     e.preventDefault(); save(); renderAll();
@@ -756,7 +855,537 @@
     }
   });
 
+  // ---------- Questionnaire rapide ----------
+  const FCFA_COUNTRIES = ['CI', 'SN', 'BF', 'CM'];
+  const isFcfa = A => FCFA_COUNTRIES.includes(A.pays || 'CI');
+  const WHO = {
+    individu: { ico:'🙋', l:'Moi', s:'Mon empreinte personnelle', title:'Mon empreinte carbone' },
+    foyer: { ico:'🏠', l:'Mon foyer', s:'Toute la famille ou le ménage', title:'Empreinte carbone du foyer' },
+    communaute: { ico:'🏘️', l:'Ma communauté', s:'Village, association, école, lieu de culte', title:'Empreinte carbone de la communauté' },
+  };
+
+  const PAYS = { id:'pays', kind:'choice', q:'Dans quel pays vivez-vous ?',
+    help:'L’impact de l’électricité dépend de la façon dont elle est produite dans votre pays.',
+    options:['CI', 'SN', 'BF', 'CM', 'GH', 'MA', 'FR', 'BE', 'CA', 'WD'].map(id => ({ v:id, l:id === 'WD' ? 'Autre pays' : GRIDS.find(g => g.id === id).label })) };
+  const FREQ = [
+    { v:0, l:'Jamais ou presque' },
+    { v:52, l:'Environ 1 fois par semaine' },
+    { v:130, l:'2 à 3 fois par semaine' },
+    { v:300, l:'Presque tous les jours' },
+  ];
+  const DECHETS = [
+    { v:'collecte', ico:'🚛', l:'Ramassés par la collecte' },
+    { v:'brule', ico:'🔥', l:'Brûlés' },
+    { v:'tri', ico:'♻️', l:'Triés, compostés ou recyclés en partie' },
+    { v:'sauvage', ico:'🗑️', l:'Jetés dans la nature ou un dépôt sauvage' },
+  ];
+
+  const personSteps = foyer => [
+    PAYS,
+    ...(foyer ? [{ id:'taille', kind:'number', q:'Combien de personnes vivent dans votre foyer ?',
+      help:'Comptez les adultes et les enfants qui partagent le logement et les repas.', def:4, min:1, max:40, unit:'personnes' }] : []),
+    { id:'cuisine', kind:'multi', q:foyer ? 'Avec quoi le foyer cuisine-t-il ?' : 'Avec quoi cuisinez-vous ?', help:'Plusieurs réponses possibles.',
+      options:[
+        { v:'gaz', ico:'🔥', l:'Gaz butane' },
+        { v:'charbon', ico:'⚫', l:'Charbon de bois' },
+        { v:'bois', ico:'🪵', l:'Bois de chauffe' },
+        { v:'elec', ico:'🔌', l:'Électricité', s:'Déjà comptée avec la facture' },
+        { v:'aucun', ico:'🍽️', l:'Je ne cuisine pas', s:'Repas pris dehors ou chez d’autres' },
+      ] },
+    { id:'gaz', kind:'choice', show:A => A.cuisine.includes('gaz'), q:'Combien de bouteilles de gaz par mois ?',
+      help:'Une bouteille B12 contient 12,5 kg de gaz ; une petite B6 compte pour une demi-bouteille.',
+      options:[ { v:0.5, l:'Moins d’une B12' }, { v:1, l:'1 bouteille B12' }, { v:2, l:'2 bouteilles B12' }, { v:3.5, l:'3 ou plus' } ] },
+    { id:'charbon', kind:'choice', show:A => A.cuisine.includes('charbon'), q:'Combien de charbon de bois par mois ?',
+      help:'Un grand sac pèse environ 30 kg.',
+      options:[ { v:0.25, l:'Quelques tas ou sachets' }, { v:1, l:'Environ 1 sac' }, { v:2, l:'2 sacs' }, { v:3.5, l:'3 sacs ou plus' } ] },
+    { id:'bois', kind:'choice', show:A => A.cuisine.includes('bois'), q:'Combien de fagots de bois par semaine ?',
+      help:'Un fagot pèse environ 10 kg.',
+      options:[ { v:1, l:'1 fagot ou moins' }, { v:3, l:'2 à 4 fagots' }, { v:7, l:'5 à 9 fagots' }, { v:12, l:'10 fagots ou plus' } ] },
+    { id:'elec', kind:'choice', q:foyer ? 'Combien le foyer dépense-t-il en électricité par mois ?' : 'Combien dépensez-vous en électricité par mois ?',
+      help:A => isFcfa(A) ? 'Regardez votre facture ou vos recharges de compteur prépayé. Si vous partagez un compteur, comptez votre part.' : 'Votre facture indique la consommation en kWh.',
+      options:[
+        { v:0, l:'Pas d’électricité du réseau' },
+        { v:55, l:'Moins de 10 000 FCFA', p:'Moins de 100 kWh' },
+        { v:170, l:'10 000 à 20 000 FCFA', p:'100 à 250 kWh' },
+        { v:330, l:'20 000 à 40 000 FCFA', p:'250 à 450 kWh' },
+        { v:670, l:'40 000 à 80 000 FCFA', p:'450 à 900 kWh' },
+        { v:1100, l:'Plus de 80 000 FCFA', p:'Plus de 900 kWh' },
+      ] },
+    { id:'vehicule', kind:'choice', q:foyer ? 'Le foyer possède-t-il une voiture ou une moto ?' : 'Avez-vous une voiture ou une moto ?',
+      options:[ { v:'none', ico:'🚶', l:'Non' }, { v:'moto', ico:'🛵', l:'Une moto' }, { v:'voiture', ico:'🚗', l:'Une voiture' }, { v:'plusieurs', ico:'🚙', l:'Plusieurs véhicules' } ] },
+    { id:'carburant', kind:'choice', show:A => A.vehicule && A.vehicule !== 'none', q:'Combien dépensez-vous en carburant par mois ?',
+      help:foyer ? 'Pour tous les véhicules du foyer.' : undefined,
+      options:[
+        { v:9, l:'Moins de 15 000 FCFA', p:'Moins de 15 litres' },
+        { v:31, l:'15 000 à 40 000 FCFA', p:'15 à 45 litres' },
+        { v:69, l:'40 000 à 80 000 FCFA', p:'45 à 90 litres' },
+        { v:131, l:'80 000 à 150 000 FCFA', p:'90 à 170 litres' },
+        { v:230, l:'Plus de 150 000 FCFA', p:'Plus de 170 litres' },
+      ] },
+    { id:'mode', kind:'choice', q:foyer ? 'Pour les autres trajets (travail, école, marché), comment se déplacent surtout les membres du foyer ?' : 'Pour vos autres trajets (travail, école, marché), quel moyen utilisez-vous le plus ?',
+      options:[
+        { v:'marche', ico:'🚶', l:'À pied ou à vélo' },
+        { v:'tc', ico:'🚌', l:'Gbaka, bus ou car' },
+        { v:'taxi', ico:'🚕', l:'Woro-woro ou taxi' },
+        { v:'moto_taxi', ico:'🏍️', l:'Taxi-moto' },
+        { v:'vehicule', ico:'🚗', l:'Notre propre véhicule', s:'Déjà compté avec le carburant' },
+      ] },
+    { id:'km', kind:'choice', show:A => ['tc', 'taxi', 'moto_taxi'].includes(A.mode),
+      q:foyer ? 'Quelle distance chaque personne parcourt-elle par jour, en moyenne ?' : 'Quelle distance parcourez-vous par jour ?',
+      help:'Aller et retour compris.',
+      options:[ { v:3, l:'Moins de 5 km' }, { v:10, l:'5 à 15 km' }, { v:22, l:'15 à 30 km' }, { v:45, l:'30 à 60 km' }, { v:80, l:'Plus de 60 km' } ] },
+    { id:'vols', kind:'numbers', q:foyer ? 'Combien de voyages en avion (aller-retour) le foyer fait-il par an ?' : 'Combien de voyages en avion (aller-retour) faites-vous par an ?',
+      help:foyer ? 'Comptez un aller-retour par personne : deux personnes qui voyagent ensemble = 2.' : 'Laissez 0 si vous ne prenez pas l’avion.',
+      fields:[
+        { id:'reg', l:'En Afrique (ex. Abidjan–Dakar, Abidjan–Lomé)', def:0, max:100 },
+        { id:'inter', l:'Vers un autre continent (Europe, Amérique, Asie…)', def:0, max:100 },
+      ] },
+    { id:'boeuf', kind:'choice', q:foyer ? 'Au foyer, à quelle fréquence mange-t-on du bœuf ou du mouton ?' : 'À quelle fréquence mangez-vous du bœuf ou du mouton ?',
+      help:'C’est l’aliment qui pèse le plus sur le climat.', options:FREQ },
+    { id:'poulet', kind:'choice', q:'Et du poulet ou du porc ?', options:FREQ },
+    { id:'poisson', kind:'choice', q:'Et du poisson ?', options:FREQ },
+    { id:'appareils', kind:'choice', q:foyer ? 'Combien d’appareils électroniques neufs le foyer achète-t-il par an ?' : 'Combien d’appareils électroniques neufs achetez-vous par an ?',
+      help:'Téléphones, ordinateurs, téléviseurs…',
+      options:[ { v:{}, l:'Aucun' }, { v:{ smartphone:1 }, l:'1 appareil' }, { v:{ smartphone:2, ordi:1 }, l:'2 ou 3 appareils' }, { v:{ smartphone:3, ordi:1, tv:1 }, l:'4 ou plus' } ] },
+    { id:'vetements', kind:'choice', q:foyer ? 'Combien de vêtements neufs chaque personne achète-t-elle par an, en moyenne ?' : 'Combien de vêtements neufs achetez-vous par an ?',
+      help:'Les vêtements de friperie (d’occasion) ne comptent pas.',
+      options:[ { v:3, l:'Moins de 5' }, { v:10, l:'5 à 15' }, { v:22, l:'15 à 30' }, { v:40, l:'Plus de 30' } ] },
+    { id:'dechets', kind:'choice', q:'Que deviennent la plupart de vos déchets ?', options:DECHETS },
+  ];
+
+  const communitySteps = () => [
+    PAYS,
+    { id:'ctype', kind:'choice', q:'De quel type de communauté s’agit-il ?',
+      options:[
+        { v:'Village ou quartier', ico:'🏘️', l:'Village ou quartier' },
+        { v:'Association', ico:'🤝', l:'Association ou ONG' },
+        { v:'École', ico:'🏫', l:'École ou université' },
+        { v:'Lieu de culte', ico:'🕌', l:'Église, mosquée, temple' },
+        { v:'Coopérative', ico:'🌾', l:'Coopérative agricole' },
+        { v:'Communauté', ico:'👥', l:'Autre' },
+      ] },
+    { id:'membres', kind:'number', q:'Combien de membres compte la communauté ?',
+      help:'Habitants, adhérents, élèves ou fidèles : les personnes concernées par le bilan.', def:100, min:1, max:10000000, unit:'membres' },
+    { id:'elec', kind:'choice', q:'Combien la communauté dépense-t-elle en électricité par mois ?',
+      help:'Pour les lieux communs : salle, école, éclairage public, pompe…',
+      options:[
+        { v:0, l:'Pas d’électricité du réseau' },
+        { v:150, l:'Moins de 25 000 FCFA', p:'Moins de 300 kWh' },
+        { v:450, l:'25 000 à 60 000 FCFA', p:'300 à 700 kWh' },
+        { v:1100, l:'60 000 à 150 000 FCFA', p:'700 à 1 700 kWh' },
+        { v:2800, l:'150 000 à 350 000 FCFA', p:'1 700 à 4 000 kWh' },
+        { v:5500, l:'Plus de 350 000 FCFA', p:'Plus de 4 000 kWh' },
+      ] },
+    { id:'groupe', kind:'choice', q:'Utilisez-vous un groupe électrogène ? Combien de gazole par mois ?',
+      options:[
+        { v:0, l:'Pas de groupe électrogène' },
+        { v:14, l:'Moins de 20 000 FCFA', p:'Moins de 20 litres' },
+        { v:49, l:'20 000 à 50 000 FCFA', p:'20 à 70 litres' },
+        { v:105, l:'50 000 à 100 000 FCFA', p:'70 à 140 litres' },
+        { v:245, l:'100 000 à 250 000 FCFA', p:'140 à 350 litres' },
+        { v:490, l:'Plus de 250 000 FCFA', p:'Plus de 350 litres' },
+      ] },
+    { id:'vehic', kind:'choice', q:'La communauté a-t-elle des véhicules (voiture, moto, tricycle) ? Carburant par mois :',
+      options:[
+        { v:0, l:'Aucun véhicule' },
+        { v:23, l:'Moins de 40 000 FCFA', p:'Moins de 45 litres' },
+        { v:69, l:'40 000 à 80 000 FCFA', p:'45 à 90 litres' },
+        { v:131, l:'80 000 à 150 000 FCFA', p:'90 à 170 litres' },
+        { v:286, l:'Plus de 150 000 FCFA', p:'Plus de 170 litres' },
+      ] },
+    { id:'repas', kind:'number', q:'Combien de repas la communauté sert-elle par mois ?',
+      help:'Cantine, fêtes, réunions, cérémonies… Mettez 0 si aucun.', def:0, min:0, max:10000000, unit:'repas par mois' },
+    { id:'feu', kind:'choice', show:A => A.repas > 0, q:'Avec quoi ces repas sont-ils cuisinés ?',
+      options:[
+        { v:'charbon', ico:'⚫', l:'Charbon de bois' },
+        { v:'bois', ico:'🪵', l:'Bois de chauffe' },
+        { v:'butane', ico:'🔥', l:'Gaz butane' },
+        { v:'elec', ico:'🔌', l:'Électricité' },
+      ] },
+    { id:'viande', kind:'choice', show:A => A.repas > 0, q:'Quelle part de ces repas contient du bœuf ou du mouton ?',
+      options:[ { v:0, l:'Jamais' }, { v:0.1, l:'Rarement (1 repas sur 10)' }, { v:0.3, l:'Souvent (1 repas sur 3)' }, { v:0.7, l:'La plupart du temps' } ] },
+    { id:'voyages', kind:'numbers', q:'Déplacements en groupe (car, bus) sur une année',
+      help:'Sorties, pèlerinages, compétitions, rencontres… Laissez 0 voyage si aucun.',
+      fields:[
+        { id:'n', l:'Nombre de voyages par an', def:0, max:10000 },
+        { id:'p', l:'Participants par voyage', def:30, max:100000 },
+        { id:'d', l:'Distance aller-retour (km)', def:100, max:50000 },
+      ] },
+    { id:'sacs', kind:'choice', q:'Quelle quantité de déchets les lieux communs produisent-ils ?', help:'Un grand sac pèse environ 20 kg.',
+      options:[ { v:0, l:'Presque rien' }, { v:1, l:'Environ 1 sac par semaine' }, { v:3, l:'2 à 4 sacs par semaine' }, { v:7, l:'Environ 1 sac par jour' }, { v:15, l:'2 sacs par jour ou plus' } ] },
+    { id:'dechets', kind:'choice', show:A => A.sacs > 0, q:'Que deviennent ces déchets ?', options:DECHETS },
+    { id:'achats', kind:'choice', q:'Quel est le budget annuel d’achats (matériel, fournitures, équipements) ?',
+      options:[
+        { v:0.25, l:'Moins de 500 000 FCFA', p:'Moins de 750 €' },
+        { v:1.25, l:'500 000 à 2 millions FCFA', p:'750 à 3 000 €' },
+        { v:3.5, l:'2 à 5 millions FCFA', p:'3 000 à 7 500 €' },
+        { v:7.5, l:'5 à 10 millions FCFA', p:'7 500 à 15 000 €' },
+        { v:15, l:'Plus de 10 millions FCFA', p:'Plus de 15 000 €' },
+      ] },
+    { id:'elevage', kind:'numbers', q:'La communauté élève-t-elle des animaux en commun ?', help:'Laissez 0 si aucun.',
+      fields:[ { id:'bovins', l:'Bovins (bœufs, vaches)', def:0, max:1000000 }, { id:'petits', l:'Moutons et chèvres', def:0, max:1000000 } ] },
+  ];
+
+  const QUIZ = { individu:personSteps(false), foyer:personSteps(true), communaute:communitySteps() };
+
+  function defaultAnswer(st) {
+    if (st.kind === 'number') return st.def;
+    if (st.kind === 'numbers') return Object.fromEntries(st.fields.map(f => [f.id, f.def]));
+    if (st.kind === 'multi') return [];
+    return undefined;
+  }
+  function resolveAnswer(st, r) {
+    if (r === undefined) { const d = defaultAnswer(st); return st.kind === 'number' ? num(d) : d; }
+    if (st.kind === 'choice') return st.options[r]?.v;
+    if (st.kind === 'multi') return r.map(i => st.options[i]?.v).filter(v => v !== undefined);
+    if (st.kind === 'number') return num(r);
+    return Object.fromEntries(st.fields.map(f => [f.id, r[f.id] === undefined ? f.def : num(r[f.id])]));
+  }
+  // Étapes visibles selon les réponses précédentes, et réponses résolues en valeurs.
+  function quizSteps(who, raw) {
+    const steps = [], A = {};
+    for (const st of QUIZ[who]) {
+      if (st.show && !st.show(A)) continue;
+      steps.push(st);
+      A[st.id] = resolveAnswer(st, raw[st.id]);
+    }
+    return { steps, A };
+  }
+  const answered = (st, r) => st.kind === 'choice' ? r !== undefined : st.kind === 'multi' ? Array.isArray(r) && r.length > 0 : true;
+
+  // Conversion des réponses en quantités annuelles pour les postes du calcul détaillé.
+  function quizProfile(who, A) {
+    const qty = {};
+    const add = (k, v) => { v = num(v); if (v > 0) qty[k] = Math.round(((qty[k] || 0) + v) * 100) / 100; };
+    const waste = kg => {
+      if (A.dechets === 'brule') add('brulage', kg);
+      else if (A.dechets === 'tri') add('dechets', kg / 2);
+      else add('dechets', kg);
+    };
+    let pop;
+    if (who === 'communaute') {
+      pop = Math.max(1, Math.round(num(A.membres)));
+      add('elec', A.elec * 12);
+      add('groupe', A.groupe * 12);
+      add('veh_essence', A.vehic * 12);
+      const repas = num(A.repas) * 12;
+      if (repas > 0) {
+        const fuelPerMeal = { charbon:0.15, bois:0.5, butane:0.05 }[A.feu];
+        if (fuelPerMeal) add(A.feu, repas * fuelPerMeal);
+        add('repas_viande', repas * num(A.viande));
+        add('repas_autres', repas * (1 - num(A.viande)));
+      }
+      add('car', A.voyages.n * A.voyages.p * A.voyages.d);
+      if (A.sacs > 0) waste(A.sacs * 20 * 52);
+      add('achats', A.achats);
+      add('bovins', A.elevage.bovins);
+      add('petits', A.elevage.petits);
+    } else {
+      pop = who === 'foyer' ? Math.max(1, Math.round(num(A.taille))) : 1;
+      if (A.cuisine.includes('gaz')) add('butane', A.gaz * 12.5 * 12);
+      if (A.cuisine.includes('charbon')) add('charbon', A.charbon * 30 * 12);
+      if (A.cuisine.includes('bois')) add('bois', A.bois * 10 * 52);
+      add('elec', A.elec * 12);
+      if (A.vehicule !== 'none') add('essence', A.carburant * 12);
+      // Le facteur taxi est par km de véhicule : un woro-woro transporte en moyenne ~3 passagers.
+      if (['tc', 'moto_taxi'].includes(A.mode)) add(A.mode, A.km * 300 * pop);
+      if (A.mode === 'taxi') add('taxi', A.km * 300 * pop / 3);
+      add('avion_court', A.vols.reg * 3000);
+      add('avion_long', A.vols.inter * 10000);
+      const b = num(A.boeuf) * pop, c = num(A.poulet) * pop, f = num(A.poisson) * pop;
+      add('repas_boeuf', b); add('repas_poulet', c); add('repas_poisson', f);
+      add('repas_vege', Math.max(0, 730 * pop - b - c - f));
+      for (const [k, v] of Object.entries(A.appareils || {})) add(k, v);
+      add('vetements', A.vetements * pop);
+      waste(180 * pop);
+    }
+    const g = GRIDS.find(x => x.id === (A.pays || 'CI'));
+    return { type:who, pop, country:g.id, grid:g.f, qty };
+  }
+
+  const THEMES = [
+    { l:'Cuisine', ids:['butane', 'charbon', 'bois'],
+      tip:'Le charbon de bois pèse lourd : un foyer amélioré réduit la consommation de 30 à 50 %, et cuisiner au gaz émet nettement moins par repas.' },
+    { l:'Électricité et énergie', ids:['elec', 'clim', 'groupe'],
+      tip:'Ampoules LED, climatisation réglée à 26 °C, appareils éteints plutôt qu’en veille ; des panneaux solaires peuvent remplacer une partie du réseau ou du groupe électrogène.' },
+    { l:'Déplacements', ids:['essence', 'gazole', 'taxi', 'moto_taxi', 'tc', 'veh_essence', 'veh_gazole', 'car', 'voiture', 'moto'],
+      tip:'Covoiturage, transports en commun, trajets regroupés et véhicule bien entretenu (pneus gonflés, moteur réglé) réduisent la consommation de carburant.' },
+    { l:'Avion', ids:['avion_court', 'avion_long', 'avion'],
+      tip:'Un aller-retour vers un autre continent représente environ 1,5 t CO₂e : regrouper ses voyages ou préférer la route pour les trajets régionaux fait une grande différence.' },
+    { l:'Alimentation', ids:['repas_boeuf', 'repas_poulet', 'repas_poisson', 'repas_vege', 'repas_viande', 'repas_autres'],
+      tip:'Un repas au bœuf émet environ 4 à 5 fois plus qu’un repas au poulet ou au poisson, et 14 fois plus qu’un repas sans viande : remplacer quelques repas au bœuf a un effet rapide.' },
+    { l:'Achats', ids:['smartphone', 'ordi', 'tv', 'vetements', 'autres', 'achats', 'eau'],
+      tip:'Garder son téléphone plus longtemps, réparer et acheter d’occasion évite l’essentiel des émissions, qui viennent de la fabrication.' },
+    { l:'Déchets', ids:['dechets', 'brulage'],
+      tip:'Brûler les déchets pollue l’air et réchauffe le climat : trier, composter les restes alimentaires et utiliser la collecte réduisent ce poste.' },
+    { l:'Élevage', ids:['bovins', 'petits'],
+      tip:'Une meilleure alimentation du bétail et la valorisation du fumier (compost, biogaz) réduisent les émissions de méthane.' },
+  ];
+
+  const quizView = $('quiz-view');
+
+  function renderQuizStart() {
+    const qz = state.quiz;
+    let resume = '';
+    if (qz.who && QUIZ[qz.who]) {
+      const n = quizSteps(qz.who, qz.answers).steps.length;
+      resume = qz.done
+        ? `<div class="resume"><span>Votre dernier résultat : <b>${WHO[qz.who].l}</b></span><button type="button" class="btn primary" data-act="show-result">Voir le résultat</button></div>`
+        : (Object.keys(qz.answers).length ? `<div class="resume"><span>Questionnaire en cours : <b>${WHO[qz.who].l}</b> · question ${Math.min(qz.step + 1, n)} sur ${n}</span><button type="button" class="btn primary" data-act="resume">Reprendre</button></div>` : '');
+    }
+    quizView.innerHTML = `<div class="panel quiz">
+      <div class="kicker">Questionnaire rapide · 3 à 5 minutes</div>
+      <h2 tabindex="-1" id="q-title" style="margin-top:8px">Pour qui voulez-vous calculer l’empreinte carbone ?</h2>
+      <p class="help">Répondez avec des ordres de grandeur : aucun chiffre précis n’est nécessaire.</p>
+      <div class="who">${Object.entries(WHO).map(([k, w]) =>
+        `<button type="button" class="opt" data-who="${k}"><span class="ico" aria-hidden="true">${w.ico}</span><span><b>${w.l}</b><small>${w.s}</small></span></button>`).join('')}</div>
+      ${resume}
+      <p class="disclaimer">Pour une entreprise ou une collectivité, utilisez le <a href="#detail" data-act="detail">calcul détaillé</a>.</p>
+    </div>`;
+  }
+
+  function stepper(key, val, f, label) {
+    return `<div class="stepper"><button type="button" data-dec="${key}" aria-label="Diminuer">−</button><input type="number" inputmode="numeric" min="${f.min ?? 0}" max="${f.max ?? ''}" step="1" value="${esc(val)}" data-num="${key}" aria-label="${esc(label)}" /><button type="button" data-inc="${key}" aria-label="Augmenter">+</button>${f.unit ? `<span class="unit">${esc(f.unit)}</span>` : ''}</div>`;
+  }
+
+  function renderQuizStep() {
+    const qz = state.quiz;
+    const { steps, A } = quizSteps(qz.who, qz.answers);
+    qz.step = Math.max(0, Math.min(qz.step, steps.length - 1));
+    const st = steps[qz.step], raw = qz.answers[st.id];
+    const txt = v => typeof v === 'function' ? v(A) : v;
+    const fc = isFcfa(A);
+    let body;
+    if (st.kind === 'choice' || st.kind === 'multi') {
+      const multi = st.kind === 'multi';
+      body = `<div class="options${st.options.length <= 3 ? ' one' : ''}" role="${multi ? 'group' : 'radiogroup'}" aria-labelledby="q-title">` + st.options.map((o, i) => {
+        const on = multi ? (raw || []).includes(i) : raw === i;
+        const label = !fc && o.p ? o.p : o.l;
+        return `<button type="button" class="opt" role="${multi ? 'checkbox' : 'radio'}" aria-checked="${on}" data-opt="${i}">${multi ? '<span class="box" aria-hidden="true">✓</span>' : ''}${o.ico ? `<span class="ico" aria-hidden="true">${o.ico}</span>` : ''}<span><b>${esc(label)}</b>${o.s ? `<small>${esc(o.s)}</small>` : ''}</span></button>`;
+      }).join('') + '</div>';
+    } else if (st.kind === 'number') {
+      body = stepper(st.id, raw ?? st.def, st, txt(st.q));
+    } else {
+      const cur = raw || {};
+      body = `<div class="fields">${st.fields.map(f => `<div><label for="n-${st.id}-${f.id}">${esc(f.l)}</label>${stepper(`${st.id}.${f.id}`, cur[f.id] ?? f.def, f, f.l).replace('<input ', `<input id="n-${st.id}-${f.id}" `)}</div>`).join('')}</div>`;
+    }
+    const last = qz.step === steps.length - 1;
+    const help = txt(st.help);
+    quizView.innerHTML = `<div class="panel quiz">
+      <div class="progress" aria-hidden="true"><span style="width:${((qz.step) / steps.length * 100).toFixed(1)}%"></span></div>
+      <div class="step-count">${WHO[qz.who].l.toUpperCase()} · QUESTION ${qz.step + 1} SUR ${steps.length}</div>
+      <h2 id="q-title" tabindex="-1">${esc(txt(st.q))}</h2>
+      ${help ? `<p class="help">${esc(help)}</p>` : ''}
+      ${body}
+      <div class="quiz-nav">
+        <button type="button" class="btn" data-act="prev">← ${qz.step === 0 ? 'Retour' : 'Précédent'}</button>
+        <button type="button" class="btn primary" data-act="next"${answered(st, raw) ? '' : ' disabled'}>${last ? 'Voir le résultat' : 'Suivant →'}</button>
+      </div>
+    </div>`;
+  }
+
+  function quizResult() {
+    const qz = state.quiz;
+    const { A } = quizSteps(qz.who, qz.answers);
+    const qp = quizProfile(qz.who, A);
+    const p = Object.assign(blankProfile(), { qty:qp.qty, grid:qp.grid, cur:'XOF' });
+    return { A, qp, r:compute(p, qp.type) };
+  }
+
+  function renderQuizResult() {
+    const qz = state.quiz, w = WHO[qz.who];
+    const { A, qp, r } = quizResult();
+    const [v, u] = mass(r.total);
+    const per = r.total / qp.pop;
+    let sub = '';
+    if (qz.who === 'foyer') sub = `soit <b>${massStr(per)}</b> par personne (${qp.pop} personne${qp.pop > 1 ? 's' : ''})`;
+    if (qz.who === 'communaute') sub = `soit <b>${massStr(per)}</b> par membre (${nf(0).format(qp.pop)} membres)`;
+
+    let gauge = '';
+    if (qz.who !== 'communaute') {
+      const ratio = per / 2000;
+      const pos = Math.min(per / 8000, 1) * 100;
+      gauge = `<div class="gauge" role="img" aria-label="${massStr(per)} par personne, pour un objectif de 2 tonnes">
+          <div class="track"><span class="mark" style="left:${pos.toFixed(1)}%"></span></div>
+          <div class="scale"><span>0 t</span><span>2 t · objectif</span><span>4 t</span><span>6 t</span><span>8 t +</span></div>
+        </div>
+        <p class="res-sub">L’objectif compatible avec l’Accord de Paris est d’environ <b>2 t CO₂e par personne et par an</b>.
+        ${ratio <= 1 ? `Avec <b>${massStr(per)}</b> par personne, vous êtes en dessous : bravo, l’enjeu est de le rester.` : `Avec <b>${massStr(per)}</b> par personne, vous êtes à <b>${nf(1).format(ratio)} fois</b> cet objectif.`}</p>`;
+    } else {
+      gauge = `<p class="res-sub">Ce bilan couvre les activités communes de la communauté, pas la vie personnelle de chaque membre. Chaque membre peut faire le questionnaire « Moi » pour son empreinte personnelle.</p>`;
+    }
+
+    const themes = THEMES.map(t => ({ l:t.l, tip:t.tip, kg:r.items.filter(i => t.ids.includes(i.id)).reduce((s, i) => s + i.kg, 0) }))
+      .filter(t => t.kg > 0).sort((a, b) => b.kg - a.kg);
+    const max = themes[0]?.kg || 1, tot = r.total || 1;
+
+    quizView.innerHTML = `<div class="panel quiz">
+      <div class="kicker">${esc(w.title)}${qz.who === 'communaute' && A.ctype ? ' · ' + esc(A.ctype) : ''}</div>
+      <h2 id="q-title" tabindex="-1" class="sr-only">Résultat</h2>
+      <div class="res-total">${v}<small>${u} par an</small></div>
+      ${sub ? `<p class="res-sub">${sub}</p>` : ''}
+      ${gauge}
+
+      <h3>D’où viennent ces émissions ?</h3>
+      <ul class="themes">${themes.map(t => `<li><div class="t"><span>${esc(t.l)}</span><span>${massStr(t.kg)} · ${Math.round(t.kg / tot * 100)} %</span></div><div class="m"><i style="width:${(t.kg / max * 100).toFixed(1)}%"></i></div></li>`).join('') || '<li class="empty">Aucune émission estimée.</li>'}</ul>
+
+      <h3>Répartition par scope</h3>
+      <div class="bar" aria-hidden="true">${[1, 2, 3].map(s => `<span style="width:${(r.byScope[s] / tot * 100).toFixed(2)}%;background:var(--s${s})"></span>`).join('')}</div>
+      <ul class="legend">${[1, 2, 3].map(s => `<li><span class="dot" style="background:var(--s${s})"></span><span>${SCOPE_NAMES[s]}</span><span class="v">${massStr(r.byScope[s])}</span><span class="p">${Math.round(r.byScope[s] / tot * 100)}&nbsp;%</span></li>`).join('')}</ul>
+
+      ${themes.length ? `<h3>Par où commencer ?</h3><ol class="tips">${themes.slice(0, 3).map(t => `<li><b>${esc(t.l)}.</b> ${esc(t.tip)}</li>`).join('')}</ol>` : ''}
+
+      <div class="res-actions">
+        <button type="button" class="btn primary" data-act="share">Partager mon résultat</button>
+        <button type="button" class="btn" data-act="to-detail">Voir le détail et affiner</button>
+        <button type="button" class="btn" data-act="edit">Modifier mes réponses</button>
+        <button type="button" class="btn" data-act="restart">Nouveau calcul</button>
+      </div>
+      <p class="disclaimer">Estimation simplifiée à partir d’ordres de grandeur (tarifs moyens de l’électricité et du carburant, facteurs d’émission indicatifs). Pour un bilan précis, utilisez « Voir le détail et affiner » et saisissez vos consommations réelles.</p>
+    </div>`;
+  }
+
+  function renderQuiz() {
+    const qz = state.quiz;
+    if (!qz.who || !QUIZ[qz.who] || qz.view === 'start') renderQuizStart();
+    else if (qz.view === 'result') renderQuizResult();
+    else renderQuizStep();
+  }
+  function focusQuiz() {
+    const h = $('q-title');
+    if (h) h.focus({ preventScroll:true });
+    const top = quizView.getBoundingClientRect().top;
+    if (top < 0 || top > window.innerHeight * 0.6) quizView.scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+
+  function quizNext() {
+    const qz = state.quiz;
+    const { steps } = quizSteps(qz.who, qz.answers);
+    const st = steps[qz.step];
+    if (!answered(st, qz.answers[st.id])) return;
+    if (qz.answers[st.id] === undefined) qz.answers[st.id] = defaultAnswer(st);
+    if (qz.step >= steps.length - 1) { qz.view = 'result'; qz.done = true; }
+    else qz.step++;
+    save(); renderQuiz(); focusQuiz();
+  }
+
+  async function shareResult(btn) {
+    const { qp, r } = quizResult();
+    const per = r.total / qp.pop;
+    const who = state.quiz.who;
+    const text = who === 'individu'
+      ? `Mon empreinte carbone estimée : ${massStr(r.total)} par an (objectif : 2 t). Et vous ?`
+      : `${WHO[who].title} : ${massStr(r.total)} par an, soit ${massStr(per)} par ${who === 'foyer' ? 'personne' : 'membre'}. Calculez la vôtre !`;
+    const url = location.href.split('#')[0];
+    if (navigator.share) {
+      try { await navigator.share({ title:'Calculateur d’empreinte carbone', text, url }); return; }
+      catch (e) { if (e.name === 'AbortError') return; }
+    }
+    try {
+      await navigator.clipboard.writeText(`${text} ${url}`);
+      const old = btn.textContent;
+      btn.textContent = 'Copié ! Collez-le où vous voulez';
+      setTimeout(() => { btn.textContent = old; }, 2500);
+    } catch (e) {
+      prompt('Copiez ce texte pour le partager :', `${text} ${url}`);
+    }
+  }
+
+  quizView.addEventListener('click', e => {
+    const qz = state.quiz;
+    const t = e.target.closest('button, a');
+    if (!t) return;
+    if (t.dataset.who) {
+      state.quiz = { view:'q', who:t.dataset.who, step:0, answers:{}, done:false };
+      save(); renderQuiz(); focusQuiz(); return;
+    }
+    if (t.dataset.opt !== undefined) {
+      const { steps } = quizSteps(qz.who, qz.answers);
+      const st = steps[qz.step], i = +t.dataset.opt;
+      if (st.kind === 'multi') {
+        const exclusive = st.options[i].v === 'aucun';
+        let cur = (qz.answers[st.id] || []).filter(x => exclusive ? false : st.options[x].v !== 'aucun');
+        cur = cur.includes(i) ? cur.filter(x => x !== i) : [...cur, i];
+        qz.answers[st.id] = cur.sort((a, b) => a - b);
+        save(); renderQuiz();
+        quizView.querySelector(`[data-opt="${i}"]`)?.focus();
+      } else {
+        qz.answers[st.id] = i;
+        save(); renderQuiz();
+        quizView.querySelector(`[data-opt="${i}"]`)?.focus();
+        const step = qz.step;
+        setTimeout(() => { if (state.quiz.view === 'q' && state.quiz.step === step && state.quiz.answers[st.id] === i) quizNext(); }, 220);
+      }
+      return;
+    }
+    if (t.dataset.inc || t.dataset.dec) {
+      const key = t.dataset.inc || t.dataset.dec;
+      const input = quizView.querySelector(`[data-num="${key}"]`);
+      const min = num(input.min), max = input.max === '' ? Infinity : num(input.max);
+      const v = Math.min(max, Math.max(min, Math.round(num(input.value)) + (t.dataset.inc ? 1 : -1)));
+      input.value = v;
+      setNumAnswer(key, v);
+      return;
+    }
+    switch (t.dataset.act) {
+      case 'next': quizNext(); break;
+      case 'prev':
+        if (qz.step === 0) qz.view = 'start'; else qz.step--;
+        save(); renderQuiz(); focusQuiz(); break;
+      case 'resume': qz.view = 'q'; save(); renderQuiz(); focusQuiz(); break;
+      case 'show-result': qz.view = 'result'; save(); renderQuiz(); focusQuiz(); break;
+      case 'edit': qz.view = 'q'; qz.step = 0; save(); renderQuiz(); focusQuiz(); break;
+      case 'restart': state.quiz = { view:'start', who:null, step:0, answers:{}, done:false }; save(); renderQuiz(); focusQuiz(); break;
+      case 'share': shareResult(t); break;
+      case 'detail': e.preventDefault(); setMode('detail'); break;
+      case 'to-detail': {
+        const { A, qp } = quizResult();
+        const existing = state.profiles[qp.type];
+        if (existing && Object.keys(existing.qty).length && !confirm(`Remplacer les données du calcul détaillé « ${TYPES[qp.type].label} » par les résultats du questionnaire ?`)) return;
+        state.type = qp.type;
+        state.profiles[qp.type] = Object.assign(blankProfile(), {
+          name: qz.who === 'communaute' ? (A.ctype || '') : (existing?.name || ''),
+          pop: qp.pop, country: qp.country, grid: qp.grid, cur: 'XOF',
+          qty: Object.fromEntries(Object.entries(qp.qty).map(([k, v]) => [k, String(v)])),
+        });
+        save(); renderAll(); setMode('detail');
+        break;
+      }
+    }
+  });
+
+  function setNumAnswer(key, v) {
+    const qz = state.quiz;
+    const [id, fid] = key.split('.');
+    if (fid) {
+      const st = QUIZ[qz.who].find(s => s.id === id);
+      qz.answers[id] = Object.assign(defaultAnswer(st), qz.answers[id] || {}, { [fid]: v });
+    } else qz.answers[id] = v;
+    save();
+  }
+  quizView.addEventListener('input', e => { if (e.target.dataset.num) setNumAnswer(e.target.dataset.num, e.target.value); });
+  quizView.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.dataset.num) { e.preventDefault(); quizNext(); } });
+
+  // ---------- Modes ----------
+  function setMode(mode, scroll = true) {
+    state.mode = mode === 'detail' ? 'detail' : 'quiz';
+    save();
+    document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === state.mode)));
+    quizView.hidden = state.mode !== 'quiz';
+    $('detail-view').hidden = state.mode !== 'detail';
+    try { history.replaceState(null, '', state.mode === 'detail' ? '#detail' : '#questionnaire'); } catch (e) {}
+    if (scroll) document.querySelector('.modes').scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+  document.querySelector('.modes').addEventListener('click', e => {
+    const b = e.target.closest('[data-mode]');
+    if (b) { setMode(b.dataset.mode, false); if (state.mode === 'quiz') renderQuiz(); }
+  });
+
+  if (location.hash === '#detail') state.mode = 'detail';
+  else if (location.hash === '#questionnaire') state.mode = 'quiz';
   renderAll();
+  renderQuiz();
+  setMode(state.mode, false);
 })();
 </script>
 </body>
