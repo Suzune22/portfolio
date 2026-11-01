@@ -169,8 +169,8 @@
   .face .top{ display:flex; justify-content:space-between; align-items:center; padding:8px 14px 0; font-family:var(--font-mono); font-size:10.5px; letter-spacing:.12em; }
   .face .role{ font-size:34px; font-weight:800; letter-spacing:-.02em; padding:2px 14px 6px; line-height:1; }
   .face .role em{ font-style:normal; color:#b35a1f; }
-  .face .ph{ margin:0 14px; aspect-ratio:4/4.3; overflow:hidden; border-radius:6px; background:#c9c2b0; }
-  .face .ph img{ width:100%; height:100%; object-fit:cover; object-position:center 20%; pointer-events:none; }
+  .face .ph{ margin:0 14px; aspect-ratio:4/4.3; overflow:hidden; border-radius:6px; background:linear-gradient(160deg,#9fc0ff,#3d6fe0); }
+  .face .ph img{ width:100%; height:auto; margin-top:6%; pointer-events:none; }
   .face .nm{ padding:10px 14px 2px; font-weight:800; font-size:15px; letter-spacing:.02em; }
   .face .sub{ padding:0 14px 14px; font-family:var(--font-mono); font-size:10px; color:#555; letter-spacing:.08em; }
   .face.back .scan{ font-family:var(--font-mono); font-size:12px; letter-spacing:.2em; color:var(--cyan); }
@@ -184,6 +184,80 @@
   @media (max-width:860px){
     .hero{ grid-template-columns:1fr; text-align:left; min-height:0; padding-top:110px; }
     .badge-stage{ height:720px; margin-top:10px; overflow:hidden; }
+  }
+
+  /* ---------- accueil : deux silhouettes qui s'échangent ---------- */
+  body{ --mode:#5b8cff; --mode-2:#3d7bff; }
+  body[data-mode="projets"]{ --mode:#f2b45a; --mode-2:#e07b3a; }
+  .mode-chip{
+    display:inline-flex; align-items:center; gap:8px; margin-top:18px; padding:7px 14px; border-radius:999px;
+    font-family:var(--font-mono); font-size:13px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--mode); border:1px solid color-mix(in srgb, var(--mode) 55%, transparent);
+    background:color-mix(in srgb, var(--mode) 14%, transparent); transition:color .6s, border-color .6s, background .6s;
+  }
+  .mode-chip::before{ content:""; width:8px; height:8px; border-radius:50%; background:var(--mode); box-shadow:0 0 12px var(--mode); }
+  .swap-text{ animation:swapText .6s ease both; }
+  @keyframes swapText{ from{ opacity:0; transform:translateY(10px); filter:blur(4px); } to{ opacity:1; transform:none; filter:none; } }
+
+  .duo{ position:relative; height:620px; }
+  .duo-disc{
+    position:absolute; left:50%; bottom:40px; width:min(440px,90%); aspect-ratio:1; transform:translateX(-36%); border-radius:50%;
+    background:radial-gradient(circle at 40% 35%, color-mix(in srgb, var(--mode) 75%, white 10%), var(--mode-2) 60%, transparent 72%);
+    opacity:.55; filter:blur(2px); transition:background .9s ease;
+  }
+  .duo-ring{
+    position:absolute; left:50%; bottom:10px; width:min(520px,100%); aspect-ratio:1; transform:translateX(-38%); border-radius:50%;
+    border:2px dashed color-mix(in srgb, var(--mode) 60%, transparent); animation:spinRing 40s linear infinite; transition:border-color .9s;
+  }
+  @keyframes spinRing{ to{ transform:translateX(-38%) rotate(360deg); } }
+  .persona{
+    position:absolute; bottom:0; left:50%; height:560px; padding:0; border:0; background:none; cursor:pointer;
+    transform-origin:bottom center; -webkit-tap-highlight-color:transparent;
+    transition:transform 1s cubic-bezier(.7,0,.25,1), filter 1s ease, opacity 1s ease, z-index 0s .5s;
+  }
+  .persona img{ height:100%; width:auto; display:block; pointer-events:none; user-select:none;
+    filter:drop-shadow(0 26px 30px rgba(3,8,40,.55)); -webkit-mask-image:linear-gradient(180deg,#000 82%,transparent); mask-image:linear-gradient(180deg,#000 82%,transparent); }
+  .persona.front{ z-index:3; transform:translateX(-38%) scale(1); filter:none; }
+  .persona.back{ z-index:1; transform:translateX(-112%) translateY(-34px) scale(.74); filter:brightness(.55) saturate(.6) blur(1.2px); }
+  .persona.back:hover{ filter:brightness(.8) saturate(.85) blur(0); transform:translateX(-114%) translateY(-40px) scale(.77); }
+  .duo.swap .persona.front{ animation:comeFront 1s cubic-bezier(.7,0,.25,1); }
+  .duo.swap .persona.back{ animation:goBack 1s cubic-bezier(.7,0,.25,1); }
+  @keyframes comeFront{ 45%{ transform:translateX(-70%) translateY(-60px) scale(.9) rotate(-3deg); } }
+  @keyframes goBack{ 45%{ transform:translateX(-30%) translateY(20px) scale(.86) rotate(4deg); } }
+  .persona .tag{
+    position:absolute; left:50%; bottom:22px; transform:translateX(-50%); white-space:nowrap;
+    display:inline-flex; align-items:center; gap:8px; padding:9px 15px; border-radius:999px;
+    font:700 15px var(--font-display); color:#fff; background:rgba(10,20,70,.75); border:1px solid var(--line-strong);
+    backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); transition:opacity .5s;
+  }
+  .persona .tag svg{ width:17px; height:17px; }
+  .persona.front .tag{ background:var(--mode-2); border-color:transparent; box-shadow:0 10px 30px -8px var(--mode); }
+  .persona.back .tag{ font-size:19px; padding:11px 18px; }
+  .persona.back::after{
+    content:""; position:absolute; inset:18% 10% 8%; border-radius:40%; border:2px solid var(--mode);
+    opacity:0; animation:callme 2.6s ease-out infinite; pointer-events:none;
+  }
+  .persona.front::after{ display:none; }
+  @keyframes callme{ 0%{ opacity:.6; transform:scale(.9); } 100%{ opacity:0; transform:scale(1.15); } }
+  .persona:focus-visible{ outline:none; }
+  .persona:focus-visible .tag{ outline:2px solid var(--cyan); outline-offset:3px; }
+  .duo-hint{ position:absolute; left:0; right:0; bottom:-30px; text-align:center; font-family:var(--font-mono); font-size:13px; color:var(--muted); animation:hint 2.4s ease-in-out infinite; }
+  .duo-hint.seen{ opacity:.0; animation:none; transition:opacity .6s; }
+
+  /* un seul volet visible à la fois */
+  body[data-mode="pro"] [data-side="projets"], body[data-mode="projets"] [data-side="pro"]{ display:none; }
+  .side{ animation:sideIn .8s cubic-bezier(.2,.7,.2,1) both; }
+  @keyframes sideIn{ from{ opacity:0; transform:translateY(30px); } to{ opacity:1; transform:none; } }
+  .about-grid .badge-stage{ height:680px; }
+
+  @media (max-width:860px){
+    .duo{ height:500px; margin-top:20px; }
+    .persona{ height:440px; }
+    .persona.back{ transform:translateX(-100%) translateY(-24px) scale(.7); }
+    .persona.back:hover{ transform:translateX(-100%) translateY(-24px) scale(.7); }
+    .persona.back .tag{ font-size:15px; }
+    .persona .tag{ font-size:13.5px; padding:8px 12px; }
+    .about-grid .badge-stage{ height:720px; }
   }
 
   /* ---------- à propos ---------- */
@@ -372,7 +446,7 @@
   }
 </style>
 </head>
-<body>
+<body data-mode="pro">
 
 <div class="sky" aria-hidden="true"></div>
 <canvas id="stars" aria-hidden="true"></canvas>
@@ -386,8 +460,8 @@
 
 <nav class="nav" aria-label="Navigation principale">
   <a href="#accueil" class="active">Accueil</a>
-  <a href="#apropos">À propos</a>
-  <a href="#portfolio">Portfolio</a>
+  <a href="#pro" data-go="pro">Professionnel</a>
+  <a href="#projets" data-go="projets">Projets</a>
   <a href="#contact">Contact</a>
 </nav>
 
@@ -398,13 +472,10 @@
     <div>
       <h1><span class="w grad" style="--i:0">Bienvenue</span> <span class="w grad" style="--i:1">sur</span><br /><span class="w" style="--i:2">mon</span> <span class="w" style="--i:3">Portfolio</span></h1>
       <div class="typed" aria-live="off"><span id="typed">Géologie, Mines, Pétrole &amp; Environnement</span><span class="caret" aria-hidden="true"></span></div>
-      <p class="intro">
-        Étudiant en troisième année de licence professionnelle à l'UTT Loko d'Abidjan, option eau et gestion de l'environnement.
-        Du terrain à la raffinerie, en passant par l'imagerie satellite et les outils numériques, je construis des projets
-        utiles pour l'environnement et les ressources naturelles en Côte d'Ivoire.
-      </p>
+      <span class="mode-chip" id="modeChip">Volet professionnel</span>
+      <p class="intro" id="heroIntro">Étudiant en troisième année de licence professionnelle à l'UTT Loko d'Abidjan, option eau et gestion de l'environnement. Stage à la Société Ivoirienne de Raffinage, formation QHSE et certifications internationales : voici mon parcours.</p>
       <div class="cta">
-        <a class="btn primary" href="#portfolio">Voir mes projets
+        <a class="btn primary" href="#pro" id="heroCta"><span id="heroCtaLabel">Voir mon parcours</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
         <a class="btn" href="#contact">Me contacter
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4 20-7Z"/></svg></a>
@@ -420,6 +491,34 @@
       </div>
     </div>
 
+    <div class="duo" id="duo">
+      <div class="duo-ring" aria-hidden="true"></div>
+      <div class="duo-disc" aria-hidden="true"></div>
+      <button class="persona front" type="button" data-mode="pro" aria-pressed="true" aria-label="Volet professionnel : formation, stages, certificats, compétences">
+        <img src="profil-pro.webp" alt="Delon Boyou en costume" draggable="false" />
+        <span class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/></svg>Professionnel</span>
+      </button>
+      <button class="persona back" type="button" data-mode="projets" aria-pressed="false" aria-label="Volet projets et engagement : projets, vie associative, actions">
+        <img src="profil-projets.webp" alt="Delon Boyou en t-shirt" draggable="false" />
+        <span class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c4-3 8-6.5 8-11a8 8 0 0 0-16 0c0 4.5 4 8 8 11Z"/><path d="M12 7v6M9 10h6"/></svg>Projets &amp; engagement</span>
+      </button>
+      <span class="duo-hint" id="duoHint">Cliquez sur l'autre photo pour changer de volet ⇄</span>
+    </div>
+  </section>
+
+  <!-- ================= VOLET PROFESSIONNEL ================= -->
+  <section id="pro" data-side="pro" class="side">
+    <h2 class="section-title"><span class="glitch" data-text="Parcours professionnel">Parcours professionnel</span></h2>
+    <p class="section-sub">Formation, stages, certifications et compétences.</p>
+    <div class="about-grid">
+      <div>
+        <h3><span class="grad">Salut, je suis</span><br />Delon Boyou</h3>
+        <div class="about-text" style="margin-top:18px">
+          <p>Je suis <strong>étudiant en Géologie, Mines, Pétrole et Environnement</strong> à l'UTT Loko, et je souhaite me spécialiser dans l'environnement et la gestion des ressources naturelles.</p>
+        </div>
+        <div class="cta"><a class="btn primary" href="#contact">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>Me contacter</a></div>
+      </div>
     <div class="badge-stage" id="badgeStage">
       <svg class="rope" id="rope" aria-hidden="true">
         <defs><path id="ropePath" d="" /></defs>
@@ -434,7 +533,7 @@
             <div class="hole"></div>
             <div class="top"><span>UTT LOKO</span><span>2024 — 2027</span></div>
             <div class="role">GÉO<em>·</em>ENV</div>
-            <div class="ph"><img src="hero.jpg" alt="" draggable="false" /></div>
+            <div class="ph"><img src="profil-pro.webp" alt="" draggable="false" /></div>
             <div class="nm">BOYOU NESTOR DELON</div>
             <div class="sub">ÉTUDIANT · GÉOLOGIE, MINES, PÉTROLE &amp; ENV.</div>
           </div>
@@ -448,22 +547,9 @@
       </div>
       <span class="drag-hint">Attrapez et lancez le badge</span>
     </div>
-  </section>
-
-  <!-- ================= À PROPOS ================= -->
-  <section id="apropos">
-    <h2 class="section-title"><span class="glitch" data-text="À propos">À propos</span></h2>
-    <div class="about-grid">
-      <div>
-        <h3><span class="grad">Salut, je suis</span><br />Delon Boyou</h3>
-        <div class="cta"><a class="btn primary" href="#contact">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>Me contacter</a></div>
-      </div>
-      <div class="about-photo"><img src="sir.jpg" alt="Delon Boyou en tenue de travail à la Société Ivoirienne de Raffinage" loading="lazy" /></div>
       <div class="about-text">
-        <p>Je suis <strong>étudiant en Géologie, Mines, Pétrole et Environnement</strong> à l'UTT Loko, et je souhaite me spécialiser dans l'environnement et la gestion des ressources naturelles.</p>
-        <p>Motivé, rigoureux et curieux, j'ai travaillé à la <strong>Société Ivoirienne de Raffinage</strong>, suivi une formation <strong>QHSE</strong>, et je développe des outils numériques : détection d'orpaillage par satellite, calculateur d'empreinte carbone, applications pour mon association.</p>
-        <p>Président de l'<strong>AE-GMPE</strong>, je travaille à rapprocher les étudiants de la filière des professionnels du secteur minier.</p>
+        <p>Motivé, rigoureux et curieux, j'ai fait un stage au département Centrale de la <strong>Société Ivoirienne de Raffinage</strong> et un stage de terrain avec l'<strong>Agence Eau et Forêt</strong>.</p>
+        <p>Je suis une formation <strong>QHSE-AC</strong> (normes ISO 9001, 14001 et 45001) et j'ai obtenu des certificats de l'Université de Liège, de l'Université Senghor et de UN CC:Learn.</p>
       </div>
     </div>
 
@@ -502,41 +588,12 @@
       <div class="stat glass"><div class="lab">Stages<small>En entreprise et sur le terrain</small></div><div class="num" data-count="2">2</div></div>
     </div>
 
-    <div class="quote-band glass">
-      <div>
-        <h3>Un peu de terrain.<br /><span>Beaucoup d'idées.</span></h3>
-        <p>Reboisement, nettoyage de plage, sorties géologiques, ateliers Fresque du Climat : l'engagement fait partie de ma formation autant que les cours.</p>
-      </div>
-      <div class="assoc">
-        <div><b>PRÉSIDENT</b>AE-GMPE Loko — Association des Étudiants en Géologie, Mines, Pétrole et Environnement</div>
-        <div><b>MEMBRE</b>FEMICI</div>
-        <div><b>ANIMATEUR</b>Fresque du Climat</div>
-        <div><b>AMBASSADEUR</b>Fix My Food</div>
-      </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tab-certifs" aria-controls="panel-certifs" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.5 13 17 22l-5-3-5 3 1.5-9"/></svg>Certificats</button>
+      <button class="tab" role="tab" id="tab-competences" aria-controls="panel-competences" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></svg>Compétences</button>
     </div>
-  </section>
-
-  <!-- ================= PORTFOLIO ================= -->
-  <section id="portfolio">
-    <h2 class="section-title"><span class="glitch" data-text="Portfolio">Portfolio</span></h2>
-    <p class="section-sub">Projets, certificats et compétences. Cliquez sur une carte pour voir les détails ou ouvrir le document.</p>
-
-    <div class="tabs" role="tablist" aria-label="Catégories du portfolio">
-      <button class="tab" role="tab" id="tab-projets" aria-controls="panel-projets" aria-selected="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Projets</button>
-      <button class="tab" role="tab" id="tab-certifs" aria-controls="panel-certifs" aria-selected="false">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.5 13 17 22l-5-3-5 3 1.5-9"/></svg>Certificats</button>
-      <button class="tab" role="tab" id="tab-engagement" aria-controls="panel-engagement" aria-selected="false">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c4-3 8-6.5 8-11a8 8 0 0 0-16 0c0 4.5 4 8 8 11Z"/><path d="M12 7v6M9 10h6"/></svg>Engagement</button>
-      <button class="tab" role="tab" id="tab-competences" aria-controls="panel-competences" aria-selected="false">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></svg>Compétences</button>
-    </div>
-
-    <div class="panel" role="tabpanel" id="panel-projets" aria-labelledby="tab-projets">
-      <div class="grid3" id="projectGrid"></div>
-    </div>
-
-    <div class="panel" role="tabpanel" id="panel-certifs" aria-labelledby="tab-certifs" hidden>
+    <div class="panel" role="tabpanel" id="panel-certifs" aria-labelledby="tab-certifs">
       <div class="grid3">
         <a class="ccard glass" href="https://www.objectif2030.org/mooc/cert/a8QMFQ/" target="_blank" rel="noopener">
           <div class="cimg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z"/></svg></div>
@@ -564,26 +621,6 @@
         </div>
       </div>
     </div>
-
-    <div class="panel" role="tabpanel" id="panel-engagement" aria-labelledby="tab-engagement" hidden>
-      <div class="skill-group">Activités</div>
-      <div class="acts">
-        <span>Plantation &amp; reboisement en milieu forestier</span>
-        <span>Nettoyage de plage</span>
-        <span>Sorties de terrain en géologie</span>
-        <span>Animation d'ateliers Fresque du Climat</span>
-        <span>Gnambélé Bootcamp — environnement &amp; climat</span>
-        <span>Consultation des jeunes pour la SNGCC 2.0</span>
-        <span>Programme de parrainage des étudiants de L1</span>
-      </div>
-      <div class="gallery">
-        <figure><img src="terrain.jpg" alt="Sortie de terrain en géologie sur un affleurement rocheux" loading="lazy" /><figcaption>Sortie terrain — géologie</figcaption></figure>
-        <figure><img src="plage.jpg" alt="Journée de nettoyage de plage" loading="lazy" /><figcaption>Nettoyage de plage</figcaption></figure>
-        <figure><img src="reboisement.jpg" alt="Plantation avec l'Agence Eau et Forêt" loading="lazy" /><figcaption>Reboisement</figcaption></figure>
-        <figure><img src="bootcamp2.jpg" alt="Delon Boyou au Gnambélé Bootcamp 2026" loading="lazy" /><figcaption>Gnambélé Bootcamp</figcaption></figure>
-      </div>
-    </div>
-
     <div class="panel" role="tabpanel" id="panel-competences" aria-labelledby="tab-competences" hidden>
       <div class="skill-group">Terrain &amp; environnement</div>
       <div class="skills">
@@ -608,6 +645,52 @@
         <div class="lang glass"><b>Français</b><span>Langue maternelle</span></div>
         <div class="lang glass"><b>Anglais</b><span>Niveau scolaire — en progression</span></div>
         <div class="lang glass"><b>Japonais</b><span>En apprentissage</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= VOLET PROJETS & ENGAGEMENT ================= -->
+  <section id="projets" data-side="projets" class="side">
+    <h2 class="section-title"><span class="glitch" data-text="Projets &amp; engagement">Projets &amp; engagement</span></h2>
+    <p class="section-sub">Mes projets, ma vie associative et les actions menées sur le terrain. Cliquez sur une carte pour voir les détails.</p>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tab-realisations" aria-controls="panel-realisations" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Projets</button>
+      <button class="tab" role="tab" id="tab-associatif" aria-controls="panel-associatif" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M14 20c0-2.5 1.5-4.5 4-4.5s3 1.5 3 4.5"/></svg>Vie associative</button>
+      <button class="tab" role="tab" id="tab-actions" aria-controls="panel-actions" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c4-3 8-6.5 8-11a8 8 0 0 0-16 0c0 4.5 4 8 8 11Z"/><path d="M12 7v6M9 10h6"/></svg>Actions</button>
+    </div>
+    <div class="panel" role="tabpanel" id="panel-realisations" aria-labelledby="tab-realisations">
+      <div class="grid3" id="projectGrid"></div>
+    </div>
+    <div class="panel" role="tabpanel" id="panel-associatif" aria-labelledby="tab-associatif" hidden>
+      <div class="quote-band glass" style="margin-top:0">
+        <div>
+          <h3>Un peu de terrain.<br /><span>Beaucoup d'idées.</span></h3>
+          <p>Président de l'AE-GMPE, je travaille à rapprocher les étudiants de la filière des professionnels du secteur minier : journée de rencontre en préparation, démarches auprès de la Chambre des Mines, de la SIR et de la GIZ, programme de parrainage des étudiants de L1.</p>
+        </div>
+      <div class="assoc">
+        <div><b>PRÉSIDENT</b>AE-GMPE Loko — Association des Étudiants en Géologie, Mines, Pétrole et Environnement</div>
+        <div><b>MEMBRE</b>FEMICI</div>
+        <div><b>ANIMATEUR</b>Fresque du Climat</div>
+        <div><b>AMBASSADEUR</b>Fix My Food</div>
+      </div>
+      </div>
+    </div>
+    <div class="panel" role="tabpanel" id="panel-actions" aria-labelledby="tab-actions" hidden>
+      <div class="skill-group">Activités</div>
+      <div class="acts">
+        <span>Plantation &amp; reboisement en milieu forestier</span>
+        <span>Nettoyage de plage</span>
+        <span>Sorties de terrain en géologie</span>
+        <span>Animation d'ateliers Fresque du Climat</span>
+        <span>Gnambélé Bootcamp — environnement &amp; climat</span>
+        <span>Consultation des jeunes pour la SNGCC 2.0</span>
+        <span>Programme de parrainage des étudiants de L1</span>
+      </div>
+      <div class="gallery">
+        <figure><img src="terrain.jpg" alt="Sortie de terrain en géologie sur un affleurement rocheux" loading="lazy" /><figcaption>Sortie terrain — géologie</figcaption></figure>
+        <figure><img src="plage.jpg" alt="Journée de nettoyage de plage" loading="lazy" /><figcaption>Nettoyage de plage</figcaption></figure>
+        <figure><img src="reboisement.jpg" alt="Plantation avec l'Agence Eau et Forêt" loading="lazy" /><figcaption>Reboisement</figcaption></figure>
+        <figure><img src="bootcamp2.jpg" alt="Delon Boyou au Gnambélé Bootcamp 2026" loading="lazy" /><figcaption>Gnambélé Bootcamp</figcaption></figure>
       </div>
     </div>
   </section>
@@ -805,17 +888,18 @@ document.documentElement.classList.add('js');
 
   /* ---------- onglets ---------- */
   var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  function groupOf(tab){ return Array.prototype.slice.call(tab.parentNode.querySelectorAll('.tab')); }
   function selectTab(tab){
-    tabs.forEach(function(t){
+    groupOf(tab).forEach(function(t){
       var on = t === tab; t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1;
       document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
     });
   }
-  tabs.forEach(function(t, i){
+  tabs.forEach(function(t){
     t.addEventListener('click', function(){ selectTab(t); });
     t.addEventListener('keydown', function(e){
       var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0; if (!d) return;
-      var n = tabs[(i + d + tabs.length) % tabs.length]; selectTab(n); n.focus();
+      var g = groupOf(t), n = g[(g.indexOf(t) + d + g.length) % g.length]; selectTab(n); n.focus();
     });
   });
 
@@ -841,7 +925,7 @@ document.documentElement.classList.add('js');
         links.forEach(function(a){ a.classList.toggle('active', a.getAttribute('href') === '#' + en.target.id); });
       });
     }, { rootMargin:'-45% 0px -50% 0px' });
-    ['accueil','apropos','portfolio','contact'].forEach(function(id){ io.observe(document.getElementById(id)); });
+    ['accueil','pro','projets','contact'].forEach(function(id){ io.observe(document.getElementById(id)); });
 
     var gio = new IntersectionObserver(function(entries){
       entries.forEach(function(en){ if (en.isIntersecting){ en.target.classList.add('play'); gio.unobserve(en.target); } });
@@ -850,19 +934,62 @@ document.documentElement.classList.add('js');
   }
 
   /* ---------- texte tapé ---------- */
-  var phrases = ['Géologie, Mines, Pétrole & Environnement', 'Eau & gestion de l’environnement', 'QHSE & normes ISO', 'Imagerie satellite & data', 'Outils numériques pour le climat'];
+  var PHRASES = {
+    pro: ['Géologie, Mines, Pétrole & Environnement', 'Eau & gestion de l\u2019environnement', 'QHSE & normes ISO', 'Stage en raffinerie (SIR)'],
+    projets: ['Imagerie satellite & data', 'Outils numériques pour le climat', 'Président de l\u2019AE-GMPE', 'Reboisement & actions de terrain']
+  };
+  var phrases = PHRASES.pro;
   var typedEl = document.getElementById('typed');
+  var pi = 0, ci = phrases[0].length, del = true;
+  if (reduce){ typedEl.textContent = phrases[0]; }
   if (!reduce){
-    var pi = 0, ci = phrases[0].length, del = true;
     setTimeout(function tick(){
-      var ph = phrases[pi];
+      var ph = phrases[pi % phrases.length];
       ci += del ? -1 : 1; typedEl.textContent = ph.slice(0, ci);
       var wait = del ? 28 : 55;
       if (del && ci === 0){ del = false; pi = (pi + 1) % phrases.length; wait = 300; }
-      else if (!del && ci === phrases[pi].length){ del = true; wait = 2200; }
+      else if (!del && ci === phrases[pi % phrases.length].length){ del = true; wait = 2200; }
       setTimeout(tick, wait);
     }, 2600);
   }
+
+  /* ---------- volets : photo en costume (professionnel) / en t-shirt (projets) ---------- */
+  var MODES = {
+    pro: { chip:'Volet professionnel', cta:'Voir mon parcours', href:'#pro',
+      intro:'Étudiant en troisième année de licence professionnelle à l\u2019UTT Loko d\u2019Abidjan, option eau et gestion de l\u2019environnement. Stage à la Société Ivoirienne de Raffinage, formation QHSE et certifications internationales : voici mon parcours.' },
+    projets: { chip:'Volet projets & engagement', cta:'Voir mes projets', href:'#projets',
+      intro:'Président de l\u2019AE-GMPE, je construis des outils pour l\u2019environnement (détection d\u2019orpaillage par satellite, calculateur d\u2019empreinte carbone, jeu sur Abidjan) et je m\u2019engage sur le terrain : reboisement, nettoyage de plage, Fresque du Climat.' }
+  };
+  var duo = document.getElementById('duo'), mode = 'pro';
+  var heroIntro = document.getElementById('heroIntro'), modeChip = document.getElementById('modeChip');
+  function setMode(m, opts){
+    opts = opts || {};
+    if (m === mode && !opts.force) return;
+    mode = m; document.body.setAttribute('data-mode', m);
+    duo.querySelectorAll('.persona').forEach(function(b){
+      var front = b.getAttribute('data-mode') === m;
+      b.classList.toggle('front', front); b.classList.toggle('back', !front); b.setAttribute('aria-pressed', front);
+    });
+    duo.classList.remove('swap'); void duo.offsetWidth; duo.classList.add('swap');
+    var c = MODES[m];
+    [modeChip, heroIntro].forEach(function(el){ el.classList.remove('swap-text'); void el.offsetWidth; el.classList.add('swap-text'); });
+    modeChip.textContent = c.chip; heroIntro.textContent = c.intro;
+    document.getElementById('heroCtaLabel').textContent = c.cta; document.getElementById('heroCta').setAttribute('href', c.href);
+    phrases = PHRASES[m]; pi = 0; ci = 0; del = false; if (reduce) typedEl.textContent = phrases[0];
+    if (m === 'pro' && typeof dropBadge === 'function') setTimeout(dropBadge, 60);
+    if (opts.scroll) document.getElementById(m).scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
+  }
+  duo.querySelectorAll('.persona').forEach(function(b){
+    b.addEventListener('click', function(){
+      var m = b.getAttribute('data-mode');
+      setMode(m === mode ? (m === 'pro' ? 'projets' : 'pro') : m);
+      document.getElementById('duoHint').classList.add('seen');
+    });
+  });
+  document.querySelectorAll('[data-go]').forEach(function(a){
+    a.addEventListener('click', function(e){ e.preventDefault(); setMode(a.getAttribute('data-go'), { scroll:true, force:true }); });
+  });
+  if (location.hash === '#projets') setMode('projets', { force:true });
 
   /* ---------- badge : cordon souple (Verlet) + carte 3D ---------- */
   var stage = document.getElementById('badgeStage'), card = document.getElementById('card3d'), faceWrap = document.getElementById('faceWrap');
@@ -870,8 +997,8 @@ document.documentElement.classList.add('js');
   var pts = [], N = 16, SEG = 22, anchor = { x:0, y:0 }, drag = null, spin = 0, spinV = 0;
   function layout(){
     var w = stage.clientWidth, mobile = innerWidth <= 860;
-    SEG = mobile ? 13 : 22;
-    anchor.x = w / 2; anchor.y = mobile ? -10 : -170;
+    SEG = 13;
+    anchor.x = w / 2; anchor.y = -10;
     if (!pts.length){
       for (var i = 0; i < N; i++){
         // départ au-dessus de l'écran : le badge tombe au chargement
@@ -937,7 +1064,9 @@ document.documentElement.classList.add('js');
   }
   card.addEventListener('pointerup', letGo); card.addEventListener('pointercancel', letGo);
   card.addEventListener('dblclick', function(){ spinV += 40; });
-  layout(); addEventListener('resize', function(){ var oy = anchor.y; layout(); });
+  layout(); addEventListener('resize', function(){ layout(); });
+  window.dropBadge = function(){ pts = []; layout(); if (reduce){ solve(); render(); } };
+  var dropBadge = window.dropBadge;
   if (reduce){ solve(); render(); }
   else { (function loop(){ step(); render(); requestAnimationFrame(loop); })(); }
   if (window.QRCode){ try { new QRCode(document.getElementById('qr'), { text:'https://www.linkedin.com/in/delon-boyou-230598385', width:130, height:130, colorDark:'#0b1748', colorLight:'#ffffff' }); } catch(err){} }
