@@ -350,6 +350,7 @@
   .findme-title{ font-size:1.05rem; font-weight:800; letter-spacing:.06em; margin:22px 0 12px; }
 
   footer{ text-align:center; padding-block:50px 40px; font-family:var(--font-mono); font-size:14px; color:var(--muted); }
+  footer .privacy{ display:inline-block; margin-top:8px; font-family:var(--font-display); font-size:13px; opacity:.75; max-width:60ch; }
 
   /* apparition au défilement (ajoutée seulement par le script) */
   .js .reveal{ opacity:0; transform:translateY(34px) scale(.98); transition:opacity .8s cubic-bezier(.2,.7,.2,1), transform .8s cubic-bezier(.2,.7,.2,1); transition-delay:var(--d,0s); }
@@ -654,7 +655,7 @@
   </section>
 </main>
 
-<footer>© Delon Boyou — mis à jour novembre 2026</footer>
+<footer>© Delon Boyou — mis à jour novembre 2026<br /><span class="privacy">Ce site compte les visites de façon anonyme : date, site de provenance, type d'appareil. Aucune donnée personnelle n'est collectée.</span></footer>
 
 <dialog class="detail" id="detail" aria-labelledby="d-title">
   <div class="d-inner">
@@ -1024,6 +1025,27 @@ document.documentElement.classList.add('js');
       requestAnimationFrame(step);
     })(start);
   } else { loader.classList.add('done'); }
+})();
+
+/* ---------- alerte de visite (voir notifications-visites/README.md) ---------- */
+(function(){
+  var VISITS_URL = ''; // URL de l'application Web Google Apps Script, qui se termine par /exec
+  try {
+    var m = location.search.match(/[?&]moi=([01])/);
+    if (m){ if (m[1] === '1') localStorage.setItem('portfolio-moi', '1'); else localStorage.removeItem('portfolio-moi'); }
+    if (!VISITS_URL || localStorage.getItem('portfolio-moi')) return;
+    var cle = 'portfolio-visite-' + new Date().toISOString().slice(0, 10);
+    if (localStorage.getItem(cle)) return; // une seule alerte par visiteur et par jour
+    localStorage.setItem(cle, '1');
+  } catch (err) { if (!VISITS_URL) return; }
+  var tz = ''; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (err) {}
+  var body = JSON.stringify({
+    page: location.href.split('?')[0], referrer: document.referrer || '',
+    mobile: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent), langue: navigator.language || '',
+    ecran: screen.width + '×' + screen.height, fuseau: tz
+  });
+  try { fetch(VISITS_URL, { method:'POST', mode:'no-cors', keepalive:true, headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body:body }); }
+  catch (err) { if (navigator.sendBeacon) navigator.sendBeacon(VISITS_URL, body); }
 })();
 </script>
 </body>
