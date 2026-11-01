@@ -201,31 +201,27 @@
 
   .duo{ position:relative; height:620px; }
   .duo-disc{
-    position:absolute; left:50%; bottom:40px; width:min(440px,90%); aspect-ratio:1; transform:translateX(-36%); border-radius:50%;
-    background:radial-gradient(circle at 40% 35%, color-mix(in srgb, var(--mode) 75%, white 10%), var(--mode-2) 60%, transparent 72%);
-    opacity:.55; filter:blur(2px); transition:background .9s ease;
+    position:absolute; left:calc(50% - 20px); bottom:40px; width:min(440px,90%); aspect-ratio:1; transform:translateX(-50%); border-radius:50%;
+    filter:blur(2px); opacity:0; transition:opacity .9s cubic-bezier(.65,0,.35,1);
   }
+  .duo-disc.pro{ background:radial-gradient(circle at 40% 35%, #8fb2ff, #3d7bff 60%, transparent 72%); }
+  .duo-disc.projets{ background:radial-gradient(circle at 40% 35%, #ffd08a, #e07b3a 60%, transparent 72%); }
+  body[data-mode="pro"] .duo-disc.pro, body[data-mode="projets"] .duo-disc.projets{ opacity:.6; }
   .duo-ring{
-    position:absolute; left:50%; bottom:10px; width:min(520px,100%); aspect-ratio:1; transform:translateX(-38%); border-radius:50%;
-    border:2px dashed color-mix(in srgb, var(--mode) 60%, transparent); animation:spinRing 40s linear infinite; transition:border-color .9s;
+    position:absolute; left:calc(50% - 20px); bottom:10px; width:min(520px,100%); aspect-ratio:1; transform:translateX(-50%); border-radius:50%;
+    border:2px dashed color-mix(in srgb, var(--mode) 60%, transparent); animation:spinRing 40s linear infinite; transition:border-color .9s cubic-bezier(.65,0,.35,1);
   }
-  @keyframes spinRing{ to{ transform:translateX(-38%) rotate(360deg); } }
+  @keyframes spinRing{ to{ transform:translateX(-50%) rotate(360deg); } }
   .persona{
     position:absolute; bottom:0; left:50%; height:560px; padding:0; border:0; background:none; cursor:pointer;
-    transform-origin:bottom center; -webkit-tap-highlight-color:transparent;
-    transition:transform .9s cubic-bezier(.65,0,.35,1), filter .9s ease, z-index 0s .45s;
+    transform-origin:bottom center; -webkit-tap-highlight-color:transparent; will-change:transform, filter;
   }
   .persona img{ height:100%; width:auto; display:block; pointer-events:none; user-select:none;
     filter:drop-shadow(0 26px 30px rgba(3,8,40,.55)); -webkit-mask-image:linear-gradient(180deg,#000 82%,transparent); mask-image:linear-gradient(180deg,#000 82%,transparent); }
-  .persona.front{ z-index:3; transform:translateX(-38%) scale(1); filter:none; }
-  .persona.back{ z-index:1; transform:translateX(-112%) translateY(-34px) scale(.74); filter:brightness(.55) saturate(.6) blur(1.2px); }
-  @media (hover:hover){ .duo:not(.busy) .persona.back:hover{ filter:brightness(.8) saturate(.85) blur(0); } }
+  /* positions et luminosité posées par le script (voir placeDuo) ; valeurs de repli sans script */
+  .persona.front{ z-index:3; transform:translateX(calc(-50% - 20px)); }
+  .persona.back{ z-index:1; transform:translateX(calc(-50% + 150px)) translateY(-34px) scale(.74); filter:brightness(.55) saturate(.6) blur(1.2px); }
   .pose{ display:block; height:100%; position:relative; }
-  /* petit arc pendant l'échange : celle qui passe devant monte puis redescend, l'autre s'enfonce un peu */
-  .persona.hop-up .pose{ animation:hopUp .9s cubic-bezier(.45,0,.55,1) 1; }
-  .persona.hop-down .pose{ animation:hopDown .9s cubic-bezier(.45,0,.55,1) 1; }
-  @keyframes hopUp{ 0%,100%{ transform:none; } 50%{ transform:translateY(-46px); } }
-  @keyframes hopDown{ 0%,100%{ transform:none; } 50%{ transform:translateY(14px); } }
   .persona .tag{
     position:absolute; left:50%; bottom:22px; transform:translateX(-50%); white-space:nowrap;
     display:inline-flex; align-items:center; gap:8px; padding:9px 15px; border-radius:999px;
@@ -233,6 +229,7 @@
     backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); transition:opacity .5s;
   }
   .persona .tag svg{ width:17px; height:17px; }
+  .persona .tag{ transition:background-color .9s, box-shadow .9s, font-size .4s, padding .4s; }
   .persona.front .tag{ background:var(--mode-2); border-color:transparent; box-shadow:0 10px 30px -8px var(--mode); }
   .persona.back .tag{ font-size:19px; padding:11px 18px; }
   .persona.back::after{
@@ -255,7 +252,6 @@
   @media (max-width:860px){
     .duo{ height:500px; margin-top:20px; }
     .persona{ height:440px; }
-    .persona.back{ transform:translateX(-100%) translateY(-24px) scale(.7); }
     .persona.back .tag{ font-size:15px; }
     .persona .tag{ font-size:13.5px; padding:8px 12px; }
     .about-grid .badge-stage{ height:720px; }
@@ -494,7 +490,8 @@
 
     <div class="duo" id="duo">
       <div class="duo-ring" aria-hidden="true"></div>
-      <div class="duo-disc" aria-hidden="true"></div>
+      <div class="duo-disc pro" aria-hidden="true"></div>
+      <div class="duo-disc projets" aria-hidden="true"></div>
       <button class="persona front" type="button" data-mode="pro" aria-pressed="true" aria-label="Volet professionnel : formation, stages, certificats, compétences">
         <span class="pose"><img src="profil-pro.webp" alt="Delon Boyou en costume" draggable="false" />
         <span class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/></svg>Professionnel</span></span>
@@ -962,18 +959,51 @@ document.documentElement.classList.add('js');
       intro:'Président de l\u2019AE-GMPE, je construis des outils pour l\u2019environnement (détection d\u2019orpaillage par satellite, calculateur d\u2019empreinte carbone, jeu sur Abidjan) et je m\u2019engage sur le terrain : reboisement, nettoyage de plage, Fresque du Climat.' }
   };
   var duo = document.getElementById('duo'), mode = 'pro';
+  var personas = { pro: duo.querySelector('.persona[data-mode="pro"]'), projets: duo.querySelector('.persona[data-mode="projets"]') };
+  // Place devant : au centre. Place derrière : à droite, plus petite et sombre.
+  // Celle de derrière contourne l'autre par la gauche en s'éclaircissant ;
+  // celle de devant bascule vers la droite en s'assombrissant.
+  function k(){ return Math.min(1, duo.clientWidth / 540); }
+  function pose(x, y, sc, rot, light){
+    var f = k();
+    return {
+      transform:'translateX(calc(-50% + ' + (x * f).toFixed(1) + 'px)) translateY(' + (y * f).toFixed(1) + 'px) scale(' + sc + ') rotate(' + rot + 'deg)',
+      filter:'brightness(' + (0.55 + 0.45 * light).toFixed(3) + ') saturate(' + (0.6 + 0.4 * light).toFixed(3) + ') blur(' + (1.2 * (1 - light)).toFixed(2) + 'px)'
+    };
+  }
+  var FRONT = pose(-20, 0, 1, 0, 1), BACK = pose(150, -34, .74, 0, 0);
+  var PATH_IN  = [ BACK, pose(20, -40, .76, -4, .2), pose(-200, -22, .84, -7, .55), pose(-120, -6, .94, -3, .85), FRONT ];
+  var PATH_OUT = [ FRONT, pose(40, 6, .95, 6, .8), pose(110, -6, .86, 9, .45), pose(150, -26, .78, 4, .15), BACK ];
+  function apply(el, p){ el.style.transform = p.transform; el.style.filter = p.filter; }
+  function placeDuo(){
+    FRONT = pose(-20, 0, 1, 0, 1); BACK = pose(150, -34, .74, 0, 0);
+    apply(personas[mode], FRONT); personas[mode].style.zIndex = 3;
+    var other = personas[mode === 'pro' ? 'projets' : 'pro']; apply(other, BACK); other.style.zIndex = 1;
+  }
+  placeDuo(); addEventListener('resize', placeDuo);
+  function swapDuo(m){
+    var inEl = personas[m], outEl = personas[m === 'pro' ? 'projets' : 'pro'];
+    inEl.setAttribute('aria-pressed', 'true'); outEl.setAttribute('aria-pressed', 'false');
+    // les étiquettes changent de couleur pendant le mouvement
+    inEl.classList.add('front'); inEl.classList.remove('back'); outEl.classList.add('back'); outEl.classList.remove('front');
+    function done(){ placeDuo(); duo.classList.remove('busy'); }
+    if (reduce || !inEl.animate){ done(); return; }
+    duo.classList.add('busy');
+    PATH_IN = [ BACK, pose(20, -40, .76, -4, .2), pose(-200, -22, .84, -7, .55), pose(-120, -6, .94, -3, .85), FRONT ];
+    PATH_OUT = [ FRONT, pose(40, 6, .95, 6, .8), pose(110, -6, .86, 9, .45), pose(150, -26, .78, 4, .15), BACK ];
+    var opts = { duration:1100, easing:'cubic-bezier(.45,0,.25,1)', fill:'forwards' };
+    var a = inEl.animate(PATH_IN.map(function(p, i){ return { transform:p.transform, filter:p.filter, offset:i / (PATH_IN.length - 1) }; }), opts);
+    outEl.animate(PATH_OUT.map(function(p, i){ return { transform:p.transform, filter:p.filter, offset:i / (PATH_OUT.length - 1) }; }), opts);
+    // elle passe devant une fois qu'elle a dépassé l'autre par la gauche
+    setTimeout(function(){ inEl.style.zIndex = 3; outEl.style.zIndex = 1; }, 520);
+    a.onfinish = function(){ inEl.getAnimations().forEach(function(x){ x.cancel(); }); outEl.getAnimations().forEach(function(x){ x.cancel(); }); done(); };
+  }
   var heroIntro = document.getElementById('heroIntro'), modeChip = document.getElementById('modeChip');
   function setMode(m, opts){
     opts = opts || {};
-    if (m === mode && !opts.force) return;
+    if (m === mode){ if (opts.scroll) document.getElementById(m).scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); return; }
     mode = m; document.body.setAttribute('data-mode', m);
-    duo.classList.add('busy'); clearTimeout(setMode.t); setMode.t = setTimeout(function(){ duo.classList.remove('busy'); }, 950);
-    duo.querySelectorAll('.persona').forEach(function(b){
-      var front = b.getAttribute('data-mode') === m;
-      b.classList.remove('hop-up', 'hop-down'); void b.offsetWidth;
-      if (!reduce) b.classList.add(front ? 'hop-up' : 'hop-down');
-      b.classList.toggle('front', front); b.classList.toggle('back', !front); b.setAttribute('aria-pressed', front);
-    });
+    swapDuo(m);
     var c = MODES[m];
     [modeChip, heroIntro].forEach(function(el){ el.classList.remove('swap-text'); void el.offsetWidth; el.classList.add('swap-text'); });
     modeChip.textContent = c.chip; heroIntro.textContent = c.intro;
