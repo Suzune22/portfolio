@@ -343,6 +343,50 @@
   .res-actions{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:12px; }
   .disclaimer{ font-size:13.5px; color:var(--fog); margin:6px auto 0; text-align:center; max-width:70ch; }
 
+  /* ---- conseiller ---- */
+  .advisor, .adv-cta{ padding:clamp(24px,5vw,44px); margin-top:14px; }
+  .adv-cta{ display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap; }
+  .adv-cta p{ margin:10px 0 0; max-width:62ch; font-weight:300; }
+  .adv-head{ display:flex; gap:18px; align-items:center; }
+  .adv-head .mono{ color:var(--ash); }
+  .adv-head h2{ margin-top:8px; color:var(--pure); }
+  .adv-avatar{ position:relative; width:64px; height:64px; flex:none; border-radius:50%;
+    background:conic-gradient(from 0deg, var(--iris), var(--orchid), var(--apricot), var(--mint), var(--cyan), var(--iris)); animation:spin 6s linear infinite; }
+  .adv-avatar span{ position:absolute; inset:6px; border-radius:50%; background:var(--card); }
+  .adv-avatar::after{ content:"✦"; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--pure); font-size:22px; animation:spin 6s linear infinite reverse; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .adv-msg{ margin-top:26px; padding:22px 24px; border-radius:20px 20px 20px 6px; background:var(--graphite); }
+  .adv-text{ margin:0; font-size:17px; font-weight:300; line-height:1.65; color:var(--cloud); min-height:3em; }
+  .adv-text.typing::after{ content:""; display:inline-block; width:8px; height:1.1em; margin-left:3px; vertical-align:-.15em; background:var(--cyan); animation:caret .8s steps(1) infinite; }
+  @keyframes caret{ 50%{ opacity:0; } }
+  .adv-kpis{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:16px; }
+  @media (max-width:760px){ .adv-kpis{ grid-template-columns:1fr; } }
+  .adv-kpis .tile{ padding:22px 24px; display:flex; flex-direction:column; gap:6px; }
+  .adv-kpis .mono{ opacity:.7; }
+  .adv-kpis b{ font-family:var(--serif); font-weight:300; font-size:40px; line-height:1; letter-spacing:-.02em; margin-top:6px; }
+  .adv-kpis span:last-child{ font-size:14px; }
+  .adv-actions{ list-style:none; margin:22px 0 0; padding:0; display:flex; flex-direction:column; gap:10px; }
+  .adv-action{ display:grid; grid-template-columns:56px 1fr; gap:16px; padding:22px; border-radius:20px; background:var(--graphite); border:1px solid var(--line);
+    transition:background-color .2s ease, transform .3s var(--ease-out); }
+  .adv-action:hover{ background:var(--steel); transform:translateX(4px); }
+  .adv-action .n{ font-family:var(--serif); font-weight:300; font-size:44px; line-height:.9; color:var(--pale-iris); }
+  .adv-action:nth-child(3n+2) .n{ color:var(--orchid); }
+  .adv-action:nth-child(3n) .n{ color:var(--cyan); }
+  .adv-action .tags{ display:flex; flex-wrap:wrap; gap:6px; color:var(--ash); }
+  .adv-action .tags span{ display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:9999px; border:1px solid var(--line-2); font-size:10px; }
+  .adv-action .tags i{ width:8px; height:8px; border-radius:2px; background:var(--c); }
+  .adv-action h4{ margin:12px 0 0; font-family:var(--serif); font-weight:300; font-size:26px; line-height:1.1; color:var(--pure); }
+  .adv-action p{ margin:8px 0 0; color:var(--ash); font-weight:300; font-size:15.5px; }
+  .adv-action .gain{ display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px; margin-top:14px; }
+  .adv-action .gain .m{ flex:1 1 100%; height:6px; border-radius:6px; background:rgba(255,255,255,.08); overflow:hidden; }
+  .adv-action .gain .m i{ display:block; height:100%; width:0; border-radius:6px; background:var(--mint); transition:width 1.2s var(--ease-out); }
+  .adv-action .gain b{ font-family:var(--mono); font-weight:500; font-size:13.5px; color:var(--mint); }
+  .adv-action .gain span{ font-family:var(--mono); font-size:12.5px; color:var(--ash); }
+  .adv-action .gain .eco{ color:var(--apricot); }
+  .advisor .adv-more{ margin-top:14px; }
+  .advisor .disclaimer{ text-align:left; margin:18px 0 0; }
+  @media (max-width:560px){ .adv-action{ grid-template-columns:1fr; } .adv-action .n{ font-size:34px; } .adv-head{ align-items:flex-start; } }
+
   /* ---- calcul détaillé ---- */
   .page-head{ text-align:center; padding-block:clamp(24px,6vw,56px) 34px; }
   .page-head .mono{ color:var(--ash); }
@@ -360,6 +404,7 @@
 
   .settings-card{ padding:clamp(20px,4vw,32px); }
   .settings-card h2{ margin-bottom:18px; color:var(--ash); }
+  .field[hidden]{ display:none; }
   .settings{ display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:14px 16px; }
   .field label{ display:block; margin-bottom:8px; color:var(--ash); font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; }
   input, select{
@@ -465,7 +510,10 @@
 
   @media print{
     body{ background:#fff; color:#000; }
-    .appbar, .quiz-nav, .res-actions, .tabs, .toolbar, .add-row, .del, details.method, .row.empty-row, footer, .marquee{ display:none !important; }
+    .appbar, .quiz-nav, .res-actions, .tabs, .toolbar, .add-row, .del, details.method, .row.empty-row, footer, .marquee, .adv-cta, .adv-more{ display:none !important; }
+    .advisor, .adv-msg, .adv-action{ background:#fff !important; color:#000; border-color:#ccc; }
+    .adv-action h4, .adv-text{ color:#000; }
+    .adv-action.more{ display:grid !important; }
     .layout{ grid-template-columns:1fr; }
     .results{ position:static; order:-1; }
     .card{ background:#fff; border-color:#ccc; break-inside:avoid; }
@@ -509,6 +557,10 @@
 <div class="card settings-card">
   <h2 class="mono">Paramètres du bilan</h2>
   <div class="settings">
+    <div class="field ent-only">
+      <label for="f-sector">Secteur d'activité</label>
+      <select id="f-sector"></select>
+    </div>
     <div class="field">
       <label for="f-name">Nom de l'entité</label>
       <input id="f-name" type="text" autocomplete="off" />
@@ -520,6 +572,10 @@
     <div class="field">
       <label for="f-pop" id="f-pop-label">Effectif</label>
       <input id="f-pop" type="number" min="0" step="any" inputmode="decimal" />
+    </div>
+    <div class="field ent-only">
+      <label for="f-ca" id="f-ca-label">Chiffre d'affaires (M FCFA)</label>
+      <input id="f-ca" type="number" min="0" step="any" inputmode="decimal" />
     </div>
     <div class="field">
       <label for="f-country">Réseau électrique</label>
@@ -573,6 +629,17 @@
     </div>
   </aside>
 </div>
+
+<section class="card adv-cta">
+  <div class="adv-head">
+    <div class="adv-avatar" aria-hidden="true"><span></span></div>
+    <div><div class="mono">Conseiller CO₂CI</div>
+    <h2 class="h-lg">Obtenir un plan de <em>réduction</em></h2>
+    <p class="ash">Le conseiller analyse vos résultats et propose des actions chiffrées (tonnes évitées, économies, coût, délai), adaptées à votre profil et à votre secteur.</p></div>
+  </div>
+  <button type="button" class="btn" id="b-advise">Analyser mes résultats <span class="arr">→</span></button>
+</section>
+<section class="card advisor" id="detail-advisor" hidden aria-live="polite"></section>
 </div>
 
 <details class="method card" id="methode">
@@ -797,6 +864,66 @@
       moto_taxi:3000, repas_boeuf:260, repas_poulet:650, repas_poisson:900, repas_vege:1840, smartphone:2,
       ordi:1, vetements:50, dechets:900 } },
   });
+  // ---------- Secteurs d'activité (entreprises) ----------
+  // Chaque secteur ajoute ses postes spécifiques aux scopes et ajuste le ratio monétaire des achats de biens.
+  const SECTORS = {
+    services: { label:'Commerce, services, banque, télécoms', ico:'🏪', ratio:350, lines:[], example:{} },
+    btp: { label:'BTP et construction', ico:'🏗️', ratio:800,
+      lines:[
+        L(1,'Spécifique BTP','engins','Gazole — engins de chantier','L',3.17,'Pelles, bulldozers, compacteurs, bétonnières'),
+        L(3,'Spécifique BTP — matériaux','ciment','Ciment acheté','t',850,'CEM I ; moins pour les ciments composés'),
+        L(3,'Spécifique BTP — matériaux','beton','Béton prêt à l’emploi','m³',250),
+        L(3,'Spécifique BTP — matériaux','acier','Acier (armatures, charpentes)','t',1900),
+        L(3,'Spécifique BTP — matériaux','enrobes','Enrobés bitumineux','t',60),
+        L(3,'Spécifique BTP — matériaux','granulats','Granulats et sables','t',4),
+      ],
+      example:{ engins:30000, ciment:2000, beton:1500, acier:300, enrobes:5000, granulats:20000 } },
+    mines: { label:'Mines et carrières', ico:'⛏️', ratio:900,
+      lines:[
+        L(1,'Spécifique mines','gazole_mine','Gazole — engins miniers','L',3.17,'Tombereaux, pelles, foreuses'),
+        L(1,'Spécifique mines','explosifs','Explosifs utilisés (détonation)','t',190),
+        L(1,'Spécifique mines','decapage','Défrichement et décapage de terrain','ha',400000,'Très variable selon le couvert forestier'),
+        L(3,'Spécifique mines — intrants','explosifs_fab','Fabrication des explosifs achetés','t',2000,'Nitrate d’ammonium, émulsions'),
+        L(3,'Spécifique mines — intrants','chaux','Chaux vive','t',1000),
+        L(3,'Spécifique mines — intrants','cyanure','Cyanure de sodium','t',3000,'Ordre de grandeur'),
+      ],
+      example:{ gazole_mine:2500000, explosifs:800, decapage:20, explosifs_fab:800, chaux:1500, cyanure:300 } },
+    energie: { label:'Énergie, pétrole et gaz', ico:'⚡', ratio:700,
+      lines:[
+        L(1,'Spécifique énergie','gaz_centrale','Gaz naturel brûlé (centrale, raffinerie)','MWh',202,'Combustion uniquement'),
+        L(1,'Spécifique énergie','torchage','Gaz torché','1 000 m³',2400),
+        L(1,'Spécifique énergie','methane','Rejets et fuites de méthane','t CH₄',28000),
+        L(1,'Spécifique énergie','sf6','Fuites de SF₆ (postes électriques)','kg',23500),
+      ],
+      example:{ gaz_centrale:900000, torchage:3000, methane:40, sf6:5 } },
+    industrie: { label:'Industrie manufacturière et agroalimentaire', ico:'🏭', ratio:600,
+      lines:[
+        L(1,'Spécifique industrie','charbon_ind','Charbon (houille) en chaudière','t',2420),
+        L(1,'Spécifique industrie','r404a','Fluide frigorigène R-404A (froid industriel)','kg',3922),
+        L(3,'Spécifique industrie — achats','emb_plastique','Emballages plastiques achetés','t',2300),
+        L(3,'Spécifique industrie — achats','emb_carton','Emballages carton achetés','t',900),
+      ],
+      example:{ charbon_ind:500, r404a:40, emb_plastique:120, emb_carton:300 } },
+    agri: { label:'Agriculture, élevage et agro-industrie', ico:'🌾', ratio:700,
+      lines:[
+        L(1,'Spécifique agriculture','engrais','Engrais azotés épandus','kg N',5.0),
+        L(1,'Spécifique agriculture','bovins','Bovins','tête',900,'Fermentation entérique + fumier'),
+        L(1,'Spécifique agriculture','petits','Ovins et caprins','tête',150),
+        L(1,'Spécifique agriculture','riz','Riziculture irriguée','ha',4000),
+        L(1,'Spécifique agriculture','deforest','Défrichement de forêt','ha',400000,'Très variable'),
+        L(3,'Spécifique agriculture — intrants','engrais_fab','Fabrication des engrais azotés achetés','kg N',4.0),
+      ],
+      example:{ engrais:20000, bovins:300, petits:500, deforest:5, engrais_fab:20000 } },
+    transport: { label:'Transport et logistique', ico:'🚚', ratio:450,
+      lines:[
+        L(1,'Spécifique transport','flotte','Gazole — camions et bus de la flotte','L',3.17),
+        L(1,'Spécifique transport','r404a','Fluide R-404A (camions frigorifiques)','kg',3922),
+      ],
+      example:{ flotte:600000, r404a:25 } },
+  };
+  const linesOf = (type, p) => type === 'entreprise' && p && SECTORS[p.sector]
+    ? TYPES[type].lines.concat(SECTORS[p.sector].lines) : TYPES[type].lines;
+
   const TAB_ORDER = ['individu', 'foyer', 'communaute', 'entreprise', 'localite'];
 
   const SCOPE_NAMES = { 1:'Scope 1 — Émissions directes', 2:'Scope 2 — Énergie indirecte', 3:'Scope 3 — Autres indirectes' };
@@ -804,7 +931,7 @@
 
   // ---------- État ----------
   const STORE = 'calculateur-scopes-v1';
-  const blankProfile = () => ({ name:'', year:new Date().getFullYear() - 1, pop:'', country:'CI', grid:0.43, cur:'XOF', qty:{}, fx:{}, custom:[] });
+  const blankProfile = () => ({ name:'', year:new Date().getFullYear() - 1, pop:'', country:'CI', grid:0.43, cur:'XOF', sector:'', ca:'', qty:{}, fx:{}, custom:[] });
   let state = { type:'individu', mode:'quiz', expert:false, profiles:{}, quiz:{ view:'start', who:null, step:0, answers:{} } };
   try {
     const saved = JSON.parse(localStorage.getItem(STORE));
@@ -823,14 +950,17 @@
   const unitOf = (line, p) => line.money ? (p.cur === 'XOF' ? 'M FCFA' : 'k€') : line.unit;
   const baseFactor = (line, p) => {
     if (line.grid) return num(p.grid) * line.grid;
-    if (line.money) return p.cur === 'XOF' ? line.f * 1000 / XOF_PER_EUR : line.f;
+    if (line.money) {
+      const f = line.id === 'achats_biens' && SECTORS[p.sector] ? SECTORS[p.sector].ratio : line.f;
+      return p.cur === 'XOF' ? f * 1000 / XOF_PER_EUR : f;
+    }
     return line.f;
   };
   const factorOf = (line, p) => has(p.fx[line.id]) ? num(p.fx[line.id]) : baseFactor(line, p);
 
   function compute(p, type) {
     const items = [];
-    for (const line of TYPES[type].lines) {
+    for (const line of linesOf(type, p)) {
       const q = num(p.qty[line.id]);
       items.push({ id:line.id, scope:line.scope, cat:line.cat, label:line.label, unit:unitOf(line, p), qty:q, factor:factorOf(line, p), kg:q * factorOf(line, p) });
     }
@@ -879,6 +1009,7 @@
   // Lance les barres et compteurs d'un bloc quand il devient visible.
   function activate(root) {
     root.querySelectorAll('[data-w]').forEach(e => { e.style.width = e.dataset.w; });
+    root.querySelectorAll('[data-typing]').forEach(e => typeText(e));
     root.querySelectorAll('[data-count]').forEach(e => {
       tween(e, +e.dataset.count, { div:+e.dataset.div || 1, dec:+e.dataset.dec || 0 }, e.dataset.final);
     });
@@ -896,6 +1027,291 @@
       }
     }, { threshold:.12, rootMargin:'0px 0px -40px 0px' });
     els.forEach(e => revealObs.observe(e));
+  }
+
+  // ---------- Conseiller CO2CI : analyse des résultats et plan de réduction ----------
+  // Moteur de règles d'expertise : chaque action cible des postes précis, avec une part de
+  // réduction réaliste. Les actions sont appliquées l'une après l'autre sur ce qui reste de
+  // chaque poste, pour ne jamais compter deux fois la même tonne évitée.
+  const AUD = { entreprise:'org', individu:'people', foyer:'people', communaute:'comm', localite:'loc' };
+  // Prix moyens en Côte d'Ivoire (FCFA par unité de saisie) pour estimer les économies.
+  const PRICES = { elec:90, gazole_fixe:715, groupe:715, gazole_veh:715, veh_gazole:715, gazole:715, engins:715, gazole_mine:715, flotte:715,
+    essence_veh:875, veh_essence:875, essence:875, butane:416, gpl:416, charbon:150, bois:40 };
+  const COST = { 1:'Coût faible', 2:'Coût moyen', 3:'Investissement' };
+  const DELAY = { court:'Court terme', moyen:'Moyen terme', long:'Long terme' };
+
+  const RULES = [
+    { id:'solaire', aud:['org', 'comm'], lines:['elec'], share:.3, cost:3, delay:'moyen', scope:2,
+      title:'Produire votre électricité avec le solaire',
+      text:c => `L’électricité du réseau (${c.q('elec')}) pèse ${c.k('elec')}. Des panneaux solaires sur les toits ou les parkings peuvent couvrir environ 30 % des besoins de jour ; l’investissement est en général amorti en 4 à 7 ans grâce aux factures évitées.` },
+    { id:'solaire-kit', aud:['people'], lines:['elec'], share:.25, cost:2, delay:'moyen', scope:2,
+      title:'Installer un kit solaire',
+      text:c => `Un kit solaire (panneau, batterie, onduleur) peut alimenter l’éclairage, les téléphones et la télévision, soit environ un quart de votre consommation (${c.q('elec')}).` },
+    { id:'efficacite', aud:['org', 'people', 'comm'], lines:['elec'], share:.15, cost:1, delay:'court', scope:2,
+      title:c => c.aud === 'org' ? 'Lancer un audit énergétique et chasser le gaspillage' : 'Réduire le gaspillage d’électricité',
+      text:c => c.aud === 'org'
+        ? `Éclairage LED, climatiseurs inverter réglés à 26 °C, extinction automatique la nuit et le week-end, suivi mensuel des compteurs : 10 à 20 % d’économie sans investissement lourd.`
+        : `Ampoules LED, climatisation à 26 °C (et portes fermées), appareils éteints plutôt qu’en veille, réfrigérateur dégivré : environ 15 % d’électricité en moins.` },
+    { id:'groupe', lines:['gazole_fixe', 'groupe'], share:.4, cost:3, delay:'moyen', scope:1,
+      title:'Hybrider les groupes électrogènes avec du solaire',
+      text:c => `Les groupes électrogènes consomment ${c.q('gazole_fixe', 'groupe')} de gazole par an (${c.k('gazole_fixe', 'groupe')}). Un système solaire avec batteries réduit leur temps de marche d’environ 40 %, ainsi que le bruit et la maintenance.` },
+    { id:'froid', lines:['r410a', 'r32', 'r134a', 'r22', 'clim', 'r404a'], share:.5, cost:1, delay:'court', scope:1,
+      title:'Stopper les fuites de fluides frigorigènes',
+      text:c => `Chaque kilo de gaz de climatisation qui fuit équivaut à près de 2 tonnes de CO₂. Contrat de maintenance avec détection des fuites, remplacement des équipements au R-22, puis passage à des fluides à faible impact (R-32, R-290, CO₂).` },
+    { id:'ecoconduite', aud:['org', 'people', 'comm'], lines:['gazole_veh', 'essence_veh', 'veh_essence', 'veh_gazole', 'essence', 'gazole', 'engins', 'gazole_mine', 'flotte'], share:.1, cost:1, delay:'court', scope:1,
+      title:c => c.aud === 'org' ? 'Former à l’écoconduite et suivre la consommation' : 'Conduire plus souplement et entretenir le véhicule',
+      text:c => c.aud === 'org'
+        ? `Formation des chauffeurs et conducteurs d’engins, suivi de la consommation par véhicule, limitation du ralenti, pneus bien gonflés et entretien régulier : environ 10 % de carburant en moins, soit ${c.q('gazole_veh', 'essence_veh', 'engins', 'gazole_mine', 'flotte', 'veh_essence', 'veh_gazole')} à la base.`
+        : `Pneus bien gonflés, moteur entretenu, vitesse modérée, trajets regroupés : environ 10 % de carburant en moins.` },
+    { id:'flotte-elec', aud:['org', 'comm'], lines:['gazole_veh', 'essence_veh', 'veh_essence', 'veh_gazole'], share:.3, cost:3, delay:'long', scope:1,
+      title:'Électrifier progressivement les véhicules légers',
+      text:c => `Lors des renouvellements, choisir des voitures hybrides ou électriques, et des motos ou tricycles électriques pour les livraisons et les coursiers.` },
+    { id:'mobilite', aud:['org'], lines:['dt_voiture', 'dt_moto', 'dt_tc'], share:.2, cost:1, delay:'court', scope:3,
+      title:'Mettre en place un plan de mobilité des salariés',
+      text:c => `Navettes d’entreprise, covoiturage organisé, horaires décalés pour éviter les embouteillages et télétravail un jour par semaine quand c’est possible.` },
+    { id:'missions', aud:['org'], lines:['avion_court', 'avion_long', 'voiture_pro', 'hotel'], share:.3, cost:1, delay:'court', scope:3,
+      title:'Réduire les déplacements professionnels en avion',
+      text:c => `Les missions représentent ${c.k('avion_court', 'avion_long', 'voiture_pro', 'hotel')}. Visioconférence pour les réunions courtes, missions regroupées, classe économique et route pour les trajets régionaux.` },
+    { id:'avion', aud:['people', 'comm'], lines:['avion_court', 'avion_long', 'avion'], share:.3, cost:1, delay:'moyen', scope:3,
+      title:'Prendre l’avion moins souvent',
+      text:c => `Vos vols pèsent ${c.k('avion_court', 'avion_long', 'avion')}. Un aller-retour vers l’Europe représente environ 1,5 t : espacer les voyages, rester plus longtemps sur place, préférer la route pour les trajets régionaux.` },
+    { id:'achats', lines:['achats_biens', 'achats_services', 'autres', 'achats'], share:.1, cost:2, delay:'long', scope:3,
+      title:c => c.aud === 'org' ? 'Intégrer le carbone dans les achats' : 'Acheter moins et mieux',
+      text:c => c.aud === 'org'
+        ? `Les achats représentent ${c.k('achats_biens', 'achats_services')}. Ajouter un critère carbone aux appels d’offres, privilégier les fournisseurs locaux et les produits reconditionnés, et demander leurs bilans aux principaux fournisseurs pour remplacer les ratios monétaires par des données réelles.`
+        : `Réparer, acheter d’occasion, mutualiser le matériel : chaque achat évité supprime les émissions de sa fabrication.` },
+    { id:'materiel', lines:['immo', 'smartphone', 'ordi', 'tv'], share:.25, cost:1, delay:'moyen', scope:3,
+      title:'Allonger la durée de vie des équipements',
+      text:c => c.aud === 'org'
+        ? `Garder ordinateurs et téléphones 5 ans au lieu de 3, choisir du reconditionné et faire réparer : l’essentiel de leur empreinte vient de la fabrication.`
+        : `Garder son téléphone et son ordinateur plus longtemps, les faire réparer ou les acheter reconditionnés.` },
+    { id:'dechets', lines:['dechets_decharge', 'dechets', 'decharge', 'dechets_ext'], share:.5, cost:1, delay:'court', scope:3,
+      title:'Trier, composter et recycler les déchets',
+      text:c => c.aud === 'loc'
+        ? `Les déchets en décharge (${c.k('decharge', 'dechets_ext')}) émettent du méthane. Centre d’enfouissement contrôlé avec captage du biogaz, compostage des déchets de marché et filières de recyclage.`
+        : `Les déchets organiques mis en décharge produisent du méthane. Tri à la source, compostage des restes alimentaires et filières de recyclage pour le plastique, le métal et le papier.` },
+    { id:'brulage', lines:['brulage'], share:.6, cost:1, delay:'court', scope:1,
+      title:'Arrêter de brûler les déchets',
+      text:c => `Brûler les déchets (${c.k('brulage')}) réchauffe le climat et pollue l’air respiré par les voisins. Composter les déchets organiques et confier le reste à la collecte.` },
+    { id:'fret', lines:['fret_route'], share:.15, cost:1, delay:'court', scope:3,
+      title:'Optimiser le transport de marchandises',
+      text:c => `Mieux remplir les camions, regrouper les livraisons et éviter les retours à vide : environ 15 % de tonnes-kilomètres en moins.` },
+    { id:'fret-air', lines:['fret_air'], share:.5, cost:2, delay:'moyen', scope:3,
+      title:'Basculer le fret aérien vers le maritime',
+      text:c => `Le fret aérien émet près de 100 fois plus que le bateau par tonne transportée : anticiper les commandes pour passer par la mer.` },
+    { id:'papier', lines:['papier'], share:.5, cost:1, delay:'court', scope:3,
+      title:'Dématérialiser les documents', text:c => `Factures, bulletins de paie et rapports en version numérique, impression recto verso par défaut.` },
+    { id:'chaudiere', lines:['gaz_nat', 'fioul_lourd', 'gpl', 'ind_gaz', 'ind_fioul'], share:.15, cost:2, delay:'moyen', scope:1,
+      title:'Améliorer le rendement des chaudières et fours',
+      text:c => `Réglage des brûleurs, calorifugeage des réseaux de vapeur, récupération de chaleur sur les fumées : 10 à 20 % de combustible en moins.` },
+    { id:'foyer-ameliore', lines:['charbon', 'bois'], share:.4, cost:1, delay:'court', scope:1,
+      title:'Cuisiner avec des foyers améliorés',
+      text:c => `Le charbon et le bois pèsent ${c.k('charbon', 'bois')}. Un foyer amélioré consomme 30 à 50 % de combustible en moins, avec moins de fumée dans la cuisine.` },
+    { id:'gaz-cuisson', aud:['people', 'comm'], lines:['charbon', 'bois'], share:.35, cost:2, delay:'moyen', scope:1,
+      title:'Passer au gaz ou à la cuisson électrique',
+      text:c => `Remplacer une partie du charbon par du gaz butane ou une plaque électrique réduit fortement les émissions par repas et protège les forêts.` },
+    { id:'boeuf', lines:['repas_boeuf', 'repas_viande'], share:.39, cost:1, delay:'court', scope:3,
+      title:c => c.aud === 'comm' ? 'Revoir les menus des repas collectifs' : 'Remplacer la moitié des repas au bœuf',
+      text:c => `Un repas au bœuf émet environ 7 kg de CO₂e, contre 1,6 kg pour le poulet ou le poisson. Remplacer la moitié des repas au bœuf ou au mouton par du poulet, du poisson, des haricots ou du niébé.` },
+    { id:'transports-partages', aud:['people'], lines:['taxi', 'moto_taxi'], share:.2, cost:1, delay:'court', scope:3,
+      title:'Partager ses trajets', text:c => `Woro-woro partagés, gbaka et bus plutôt que taxis individuels ; regrouper ses courses.` },
+    { id:'vetements', aud:['people'], lines:['vetements'], share:.3, cost:1, delay:'court', scope:3,
+      title:'Acheter moins de vêtements neufs', text:c => `Friperie, couturier pour retoucher et réparer, pagnes réutilisés.` },
+    { id:'transport-public', aud:['loc'], lines:['essence', 'gazole'], share:.1, cost:3, delay:'long', scope:1,
+      title:'Développer les transports en commun',
+      text:c => `Le carburant vendu sur le territoire représente ${c.k('essence', 'gazole')}. Lignes de bus, bateaux-bus, voies réservées et pistes cyclables réduisent l’usage de la voiture individuelle.` },
+    { id:'eclairage', aud:['loc'], lines:['elec'], share:.1, cost:2, delay:'moyen', scope:2,
+      title:'Passer l’éclairage public en LED et solaire', text:c => `Lampadaires LED et solaires, extinction partielle au cœur de la nuit, bâtiments publics économes.` },
+    { id:'elevage', lines:['bovins', 'petits'], share:.15, cost:2, delay:'long', scope:1,
+      title:'Réduire le méthane de l’élevage',
+      text:c => `Meilleure alimentation du bétail (fourrages de qualité), troupeaux plus productifs et biodigesteurs qui transforment le fumier en biogaz pour la cuisine.` },
+    { id:'engrais', lines:['engrais', 'engrais_fab'], share:.2, cost:1, delay:'moyen', scope:1,
+      title:'Raisonner la fertilisation azotée',
+      text:c => `Analyses de sol, apports fractionnés au bon moment, légumineuses en rotation et compost : 20 % d’engrais azoté en moins sans perte de rendement.` },
+    { id:'foret', lines:['deforest', 'decapage'], share:.3, cost:2, delay:'moyen', scope:1,
+      title:c => c.sector === 'mines' ? 'Limiter le décapage et réhabiliter au fur et à mesure' : 'Stopper le défrichement',
+      text:c => `Le défrichement (${c.k('deforest', 'decapage')}) libère le carbone stocké dans les arbres et les sols. Réduire les surfaces ouvertes, réhabiliter et replanter progressivement ; les arbres replantés sont comptés à part comme absorptions.` },
+    // --- spécifiques aux secteurs ---
+    { id:'ciment', lines:['ciment', 'beton'], share:.25, cost:2, delay:'moyen', scope:3,
+      title:'Choisir des ciments et bétons bas carbone',
+      text:c => `Ciment et béton pèsent ${c.k('ciment', 'beton')}. Ciments composés (CEM II ou III avec laitier, pouzzolanes ou argiles calcinées), dosage optimisé et bétons adaptés à chaque ouvrage : environ 25 % en moins.` },
+    { id:'acier', lines:['acier'], share:.3, cost:2, delay:'moyen', scope:3,
+      title:'Privilégier l’acier recyclé',
+      text:c => `L’acier issu de ferraille recyclée (four électrique) émet deux à trois fois moins que l’acier primaire : l’exiger dans les commandes d’armatures et de charpentes.` },
+    { id:'reemploi', lines:['enrobes', 'granulats'], share:.2, cost:1, delay:'moyen', scope:3,
+      title:'Recycler les enrobés et réemployer les déblais', text:c => `Recyclage des agrégats d’enrobés, enrobés tièdes et réemploi des déblais sur site.` },
+    { id:'tir', lines:['explosifs', 'explosifs_fab'], share:.1, cost:1, delay:'court', scope:1,
+      title:'Optimiser les plans de tir',
+      text:c => `Une meilleure fragmentation réduit la quantité d’explosifs et l’énergie de concassage et de broyage.` },
+    { id:'flotte-miniere', lines:['gazole_mine'], share:.12, cost:2, delay:'moyen', scope:1,
+      title:'Réduire la consommation de la flotte minière',
+      text:c => `Les engins miniers consomment ${c.q('gazole_mine')} de gazole (${c.k('gazole_mine')}). Pistes de roulage entretenues, charge utile optimisée, ralenti limité, puis à terme trolley ou électrification.` },
+    { id:'intrants-mine', lines:['chaux', 'cyanure'], share:.1, cost:1, delay:'court', scope:3,
+      title:'Ajuster les dosages de réactifs', text:c => `Contrôle en continu des dosages de chaux et de cyanure dans le circuit de traitement.` },
+    { id:'torchage', lines:['torchage'], share:.6, cost:3, delay:'moyen', scope:1,
+      title:'Valoriser le gaz au lieu de le torcher',
+      text:c => `Le torchage émet ${c.k('torchage')}. Récupérer le gaz associé pour produire de l’électricité, du GPL ou le réinjecter (initiative « zéro torchage de routine »).` },
+    { id:'methane', lines:['methane'], share:.6, cost:2, delay:'court', scope:1,
+      title:'Détecter et réparer les fuites de méthane',
+      text:c => `Le méthane réchauffe 28 fois plus que le CO₂. Campagnes de détection par caméra infrarouge et réparation rapide des fuites : environ 60 % de rejets en moins, souvent rentables grâce au gaz récupéré.` },
+    { id:'sf6', lines:['sf6'], share:.5, cost:2, delay:'moyen', scope:1,
+      title:'Limiter les fuites de SF₆', text:c => `Maintenance des disjoncteurs, récupération du gaz lors des interventions et appareillages sans SF₆ pour les nouveaux postes.` },
+    { id:'centrale', lines:['gaz_centrale'], share:.15, cost:3, delay:'long', scope:1,
+      title:'Améliorer le rendement des installations',
+      text:c => `Le gaz brûlé représente ${c.k('gaz_centrale')}. Passage en cycle combiné, maintenance des turbines et récupération de chaleur : environ 15 % de gaz en moins par MWh produit.` },
+    { id:'charbon-ind', lines:['charbon_ind'], share:.3, cost:3, delay:'long', scope:1,
+      title:'Remplacer le charbon en chaudière',
+      text:c => `Passer au gaz naturel ou à la biomasse durable (coques de cajou, cabosses de cacao, bagasse) pour la production de vapeur.` },
+    { id:'emballages', lines:['emb_plastique', 'emb_carton'], share:.2, cost:2, delay:'moyen', scope:3,
+      title:'Écoconcevoir les emballages', text:c => `Emballages allégés, matières recyclées et consignes ou reprises chez les clients professionnels.` },
+  ];
+
+  function advise(type, p, r, sectorKey) {
+    const aud = AUD[type], total = r.total;
+    const item = {}; for (const it of r.items) item[it.id] = it;
+    const kgOf = ids => ids.reduce((s, id) => s + (item[id] ? item[id].kg : 0), 0);
+    const c = {
+      aud, sector:sectorKey,
+      k:(...ids) => massStr(kgOf(ids)),
+      q:(...ids) => { const its = ids.map(id => item[id]).filter(i => i && i.qty); return its.length ? `${nf(0).format(its.reduce((s, i) => s + i.qty, 0))} ${its[0].unit}` : '—'; },
+    };
+    const remaining = {}; for (const it of r.items) remaining[it.id] = it.kg;
+    const candidates = RULES.filter(rule => !rule.aud || rule.aud.includes(aud))
+      .map(rule => ({ rule, potential:rule.lines.reduce((s, id) => s + (remaining[id] || 0), 0) * rule.share }))
+      .filter(x => x.potential > Math.max(1, total * 0.004))
+      .sort((a, b) => b.potential - a.potential);
+    const rate = p.cur === 'EUR' ? 1 / XOF_PER_EUR : 1;
+    const actions = [];
+    for (const { rule } of candidates) {
+      let kg = 0, money = 0;
+      for (const id of rule.lines) {
+        if (!remaining[id]) continue;
+        const cut = remaining[id] * rule.share;
+        kg += cut;
+        if (PRICES[id] && type !== 'localite' && item[id].factor > 0) money += cut / item[id].factor * PRICES[id];
+        remaining[id] -= cut;
+      }
+      if (kg <= 0) continue;
+      actions.push({ id:rule.id, title:typeof rule.title === 'function' ? rule.title(c) : rule.title, text:rule.text(c), kg, money:money * rate,
+        cost:rule.cost, delay:rule.delay, scope:rule.scope });
+    }
+    actions.sort((a, b) => b.kg - a.kg);
+    const potential = actions.reduce((s, a) => s + a.kg, 0);
+    const savings = actions.reduce((s, a) => s + a.money, 0);
+    return { actions, potential, savings, c, item };
+  }
+
+  const moneyStr = (v, cur) => cur === 'EUR'
+    ? `${nf(0).format(Math.round(v / 10) * 10)} €`
+    : (v >= 1e6 ? `${nf(1).format(v / 1e6)} M FCFA` : `${nf(0).format(Math.round(v / 1000) * 1000)} FCFA`);
+
+  // Rédige le diagnostic en langage clair à partir des résultats.
+  function adviceSummary(type, p, r, plan, extra) {
+    const total = r.total, pop = num(p.pop) || extra.pop || 0, aud = AUD[type];
+    if (!total) return 'Je n’ai pas encore de données à analyser : renseignez au moins quelques postes, puis relancez l’analyse.';
+    const top = r.items.filter(i => i.kg > 0).sort((a, b) => b.kg - a.kg);
+    const top3 = top.slice(0, 3), topShare = Math.round(top3.reduce((s, i) => s + i.kg, 0) / total * 100);
+    const maxScope = [1, 2, 3].sort((a, b) => r.byScope[b] - r.byScope[a])[0];
+    const names = top3.map(i => i.label.toLowerCase().replace(/ \(.*\)$/, ''));
+    const list = names.length > 1 ? names.slice(0, -1).join(', ') + ' et ' + names[names.length - 1] : names[0];
+    const sc = SECTORS[p.sector];
+    let txt = '';
+    if (aud === 'org') {
+      const ca = num(p.ca);
+      txt += `${p.name ? esc(p.name) : 'Votre entreprise'}${sc ? ` (secteur ${sc.label})` : ''} émet environ ${massStr(total)} par an`;
+      txt += pop ? `, soit ${massStr(total / pop)} par salarié` : '';
+      txt += ca ? ` et ${massStr(total / ca)} par ${p.cur === 'XOF' ? 'million de FCFA' : 'millier d’euros'} de chiffre d’affaires` : '';
+      txt += `. Le scope ${maxScope} est le plus lourd (${Math.round(r.byScope[maxScope] / total * 100)} %). `;
+    } else if (aud === 'people') {
+      const per = total / (pop || 1);
+      txt += `${type === 'foyer' ? 'Votre foyer émet ' : 'Votre empreinte est d’'}environ ${massStr(total)} par an${type === 'foyer' && pop > 1 ? `, soit ${massStr(per)} par personne` : ''}, `;
+      txt += per <= 2000 ? `sous l’objectif de 2 t par personne : bravo. ` : `soit ${nf(1).format(per / 2000)} fois l’objectif de 2 t par personne. `;
+    } else {
+      txt += `Les émissions estimées s’élèvent à ${massStr(total)} par an${pop ? `, soit ${massStr(total / pop)} par ${aud === 'loc' ? 'habitant' : 'membre'}` : ''}. `;
+    }
+    txt += `Trois postes concentrent ${topShare} % du total : ${list}. C’est là que se trouvent les leviers les plus efficaces. `;
+    if (plan.actions.length) {
+      txt += `J’ai retenu ${plan.actions.length} action${plan.actions.length > 1 ? 's' : ''} adaptée${plan.actions.length > 1 ? 's' : ''} à vos résultats : ensemble, elles réduiraient les émissions d’environ ${massStr(plan.potential)} par an (−${Math.round(plan.potential / total * 100)} %)`;
+      txt += plan.savings > 0 ? `, avec près de ${moneyStr(plan.savings, p.cur)} d’économies d’énergie par an.` : '.';
+    }
+    // Conseils sur la qualité des données
+    const tips = [];
+    if (aud === 'org') {
+      if (!(plan.item.elec && plan.item.elec.qty)) tips.push('renseignez la consommation d’électricité (factures annuelles)');
+      if (sc && sc.lines.length && !sc.lines.some(l => plan.item[l.id] && plan.item[l.id].qty)) tips.push(`complétez les postes spécifiques à votre secteur (${sc.lines.slice(0, 3).map(l => l.label.toLowerCase()).join(', ')})`);
+      if (!sc) tips.push('choisissez votre secteur d’activité pour obtenir les postes et les conseils propres à votre métier');
+      const moneyKg = ['achats_biens', 'achats_services', 'immo'].reduce((s, id) => s + (plan.item[id] ? plan.item[id].kg : 0), 0);
+      if (moneyKg > total * 0.3) tips.push('remplacez les ratios monétaires des achats par des quantités physiques (tonnes de matières), plus précises');
+    }
+    if (tips.length) txt += ` Pour affiner l’analyse : ${tips.join(' ; ')}.`;
+    return txt;
+  }
+
+  function adviceTarget(type, p, r) {
+    const aud = AUD[type];
+    if (aud === 'people') return null;
+    const year = Math.max(2015, Math.min(2030, Math.round(num(p.year)) || new Date().getFullYear() - 1));
+    const years = Math.max(1, 2030 - year);
+    return { year:2030, kg:r.total * Math.max(0, 1 - 0.042 * years), cut:Math.min(1, 0.042 * years) };
+  }
+
+  // Affiche le plan ; le diagnostic s'écrit progressivement, comme un assistant qui rédige.
+  function renderAdvice(host, type, p, r, extra = {}) {
+    const plan = advise(type, p, r, p.sector);
+    const summary = adviceSummary(type, p, r, plan, extra);
+    const target = adviceTarget(type, p, r);
+    const maxKg = plan.actions[0]?.kg || 1;
+    const shown = extra.limit || 6;
+    const actionHtml = (a, i) => `<li class="adv-action${i >= shown ? ' more' : ''}"${i >= shown ? ' hidden' : ''}>
+        <span class="n">${String(i + 1).padStart(2, '0')}</span>
+        <div class="body">
+          <div class="tags mono"><span style="--c:var(--s${a.scope})"><i></i>Scope ${a.scope}</span><span>${COST[a.cost]}</span><span>${DELAY[a.delay]}</span></div>
+          <h4>${esc(a.title)}</h4>
+          <p>${a.text}</p>
+          <div class="gain"><div class="m"><i data-w="${(a.kg / maxKg * 100).toFixed(1)}%"></i></div>
+            <b>−${massStr(a.kg)} / an</b><span>−${Math.max(1, Math.round(a.kg / r.total * 100))} %</span>${a.money > 0 ? `<span class="eco">≈ ${moneyStr(a.money, p.cur)} économisés / an</span>` : ''}</div>
+        </div>
+      </li>`;
+    host.innerHTML = `
+      <div class="adv-head">
+        <div class="adv-avatar" aria-hidden="true"><span></span></div>
+        <div><div class="mono">Conseiller CO₂CI · analyse automatique de vos résultats</div>
+        <h2 class="h-lg">Votre plan de <em>réduction</em></h2></div>
+      </div>
+      <div class="adv-msg"><p class="adv-text" data-typing>${summary}</p></div>
+      ${r.total ? `<div class="adv-kpis">
+        <div class="tile t-mint"><span class="mono">Potentiel de réduction</span><b>−${massStr(plan.potential)}</b><span>par an, soit −${Math.round(plan.potential / (r.total || 1) * 100)} %</span></div>
+        <div class="tile t-apricot"><span class="mono">Économies d’énergie</span><b>${plan.savings > 0 ? moneyStr(plan.savings, p.cur) : '—'}</b><span>${plan.savings > 0 ? 'par an, estimation' : 'non chiffrées pour ce profil'}</span></div>
+        ${target ? `<div class="tile t-pale"><span class="mono">Cap 2030 (trajectoire 1,5 °C)</span><b>${massStr(target.kg)}</b><span>soit −${Math.round(target.cut * 100)} % : environ −4,2 % par an</span></div>`
+                 : `<div class="tile t-pale"><span class="mono">Objectif par personne</span><b>2 t CO₂e</b><span>par an, compatible avec l’Accord de Paris</span></div>`}
+      </div>` : ''}
+      ${plan.actions.length ? `<ol class="adv-actions">${plan.actions.map(actionHtml).join('')}</ol>
+        ${plan.actions.length > shown ? `<button type="button" class="btn ghost small adv-more">Voir les ${plan.actions.length - shown} autres actions</button>` : ''}` : ''}
+      <p class="disclaimer">Analyse générée automatiquement dans votre navigateur à partir de règles d’expertise (aucune donnée n’est envoyée). Les réductions et économies sont des ordres de grandeur à confirmer par une étude technique ; les actions sont comptées sans double emploi.</p>`;
+    host.querySelector('.adv-more')?.addEventListener('click', e => {
+      host.querySelectorAll('.adv-action.more').forEach(li => { li.hidden = false; activate(li); });
+      e.currentTarget.remove();
+    });
+    return plan;
+  }
+
+  // Effet « l'assistant écrit » sur le diagnostic.
+  function typeText(el) {
+    if (el._typed) return;
+    el._typed = true;
+    const html = el.innerHTML, text = el.textContent;
+    if (REDUCE) return;
+    el.classList.add('typing');
+    el.textContent = '';
+    let i = 0;
+    const step = () => {
+      if (!el.isConnected) return;
+      i = Math.min(text.length, i + 3);
+      el.textContent = text.slice(0, i);
+      if (i < text.length) setTimeout(step, 14);
+      else { el.innerHTML = html; el.classList.remove('typing'); }
+    };
+    setTimeout(step, 700);
   }
 
   // ---------- Rendu ----------
@@ -924,6 +1340,12 @@
     $('f-grid').readOnly = p.country !== 'XX';
     $('f-cur').value = p.cur;
     $('f-expert').checked = !!state.expert;
+    const isEnt = state.type === 'entreprise';
+    document.querySelectorAll('.ent-only').forEach(el => { el.hidden = !isEnt; });
+    $('f-sector').innerHTML = `<option value="">Choisir un secteur…</option>` + Object.entries(SECTORS).map(([k, sc]) =>
+      `<option value="${k}"${k === p.sector ? ' selected' : ''}>${sc.ico} ${esc(sc.label)}</option>`).join('');
+    $('f-ca').value = p.ca || '';
+    $('f-ca-label').textContent = `Chiffre d'affaires (${p.cur === 'XOF' ? 'M FCFA' : 'k€'})`;
   }
 
   function factorCell(line, p) {
@@ -944,7 +1366,7 @@
         <summary><span class="num" aria-hidden="true">${s}</span><span><h2>${SCOPE_NAMES[s]}</h2><p>${t.scopes[s]}</p></span>
         <span class="right"><span class="sum" data-sum="${s}"></span><span class="chev" aria-hidden="true">▾</span></span></summary>`;
       let cat = null;
-      for (const line of t.lines.filter(l => l.scope === s)) {
+      for (const line of linesOf(state.type, p).filter(l => l.scope === s)) {
         if (line.cat !== cat) { cat = line.cat; html += `<div class="cat mono">${esc(cat)}</div>`; }
         const v = has(p.qty[line.id]) ? p.qty[line.id] : '';
         html += `<div class="row" data-row="${line.id}">
@@ -985,7 +1407,7 @@
     }
     // Facteurs dépendant du réseau ou de la devise (mode lecture)
     if (!state.expert) {
-      for (const line of t.lines) {
+      for (const line of linesOf(state.type, p)) {
         const v = form.querySelector(`[data-row="${line.id}"] .fx .val`);
         if (v) v.textContent = fmtNum(factorOf(line, p), 4);
       }
@@ -1002,9 +1424,12 @@
     $('r-total').querySelector('small').textContent = pp.u;
     tween(rnum, r.total, pp, mass(r.total)[0], 600);
     const pop = num(p.pop);
-    $('r-int').innerHTML = pop > 0 && r.total > 0
+    const ca = state.type === 'entreprise' ? num(p.ca) : 0;
+    $('r-int').innerHTML = (pop > 0 && r.total > 0
       ? `soit <b>${massStr(r.total / pop)}</b> par ${t.per}`
-      : (r.total > 0 ? `Renseignez « ${t.pop.toLowerCase()} » pour obtenir l'intensité par ${t.per}.` : 'Saisissez au moins une donnée d’activité.');
+      : (r.total > 0 ? `Renseignez « ${t.pop.toLowerCase()} » pour obtenir l'intensité par ${t.per}.` : 'Saisissez au moins une donnée d’activité.'))
+      + (ca > 0 && r.total > 0 ? `<br>et <b>${massStr(r.total / ca)}</b> par ${p.cur === 'XOF' ? 'million de FCFA' : 'millier d’euros'} de chiffre d’affaires` : '')
+      + (state.type === 'entreprise' && SECTORS[p.sector] ? `<br><span class="mono">${SECTORS[p.sector].ico} ${esc(SECTORS[p.sector].label)}</span>` : '');
 
     const tot = r.total || 1;
     $('r-bar').innerHTML = [1, 2, 3].map(s => `<span style="width:${(r.byScope[s] / tot * 100).toFixed(2)}%;background:var(--s${s})"></span>`).join('');
@@ -1035,7 +1460,8 @@
   $('tabs').addEventListener('click', e => {
     const b = e.target.closest('[data-type]');
     if (!b || b.dataset.type === state.type) return;
-    state.type = b.dataset.type; save(); renderAll();
+    state.type = b.dataset.type; save(); renderAll(); $('detail-advisor').hidden = true;
+    $('b-advise').innerHTML = 'Analyser mes résultats <span class="arr">→</span>';
     $('tabs').querySelector(`[data-type="${state.type}"]`).focus();
   });
   $('tabs').addEventListener('keydown', e => {
@@ -1058,7 +1484,9 @@
     if (g.f === null) $('f-grid').focus();
   });
   $('f-grid').addEventListener('input', e => { prof().grid = e.target.value; save(); renderResults(); });
-  $('f-cur').addEventListener('change', e => { prof().cur = e.target.value; save(); renderForm(); renderResults(); });
+  $('f-cur').addEventListener('change', e => { prof().cur = e.target.value; save(); renderSettings(); renderForm(); renderResults(); });
+  $('f-sector').addEventListener('change', e => { prof().sector = e.target.value; save(); renderForm(); renderResults(); });
+  $('f-ca').addEventListener('input', e => { prof().ca = e.target.value; save(); renderResults(); });
   $('f-expert').addEventListener('change', e => { state.expert = e.target.checked; save(); renderForm(); renderResults(); });
 
   form.addEventListener('input', e => {
@@ -1092,7 +1520,9 @@
     const p = prof(), ex = TYPES[state.type].example;
     const hasData = Object.keys(p.qty).length || p.custom.length;
     if (hasData && !confirm('Remplacer les données saisies par un exemple ?')) return;
-    p.qty = Object.fromEntries(Object.entries(ex.qty).map(([k, v]) => [k, String(v)]));
+    const sectorEx = state.type === 'entreprise' && SECTORS[p.sector] ? SECTORS[p.sector].example : {};
+    p.qty = Object.fromEntries(Object.entries(Object.assign({}, ex.qty, sectorEx)).map(([k, v]) => [k, String(v)]));
+    if (state.type === 'entreprise' && !p.ca) p.ca = 3500;
     p.pop = ex.pop; p.cur = ex.cur; p.custom = []; p.fx = {};
     if (!p.name) p.name = 'Exemple';
     save(); renderAll();
@@ -1102,6 +1532,14 @@
     state.profiles[state.type] = blankProfile(); save(); renderAll();
   });
   $('b-print').addEventListener('click', () => window.print());
+  $('b-advise').addEventListener('click', e => {
+    const host = $('detail-advisor'), p = prof();
+    host.hidden = false;
+    renderAdvice(host, state.type, p, compute(p, state.type));
+    e.currentTarget.innerHTML = 'Mettre à jour l\u2019analyse <span class="arr">→</span>';
+    host.scrollIntoView({ behavior:REDUCE ? 'auto' : 'smooth', block:'start' });
+    setTimeout(() => activate(host), 350);
+  });
 
   function download(name, text, type) {
     const a = document.createElement('a');
@@ -1120,7 +1558,7 @@
     rows.push([]);
     for (const s of [1, 2, 3]) rows.push([s, q('Total ' + SCOPE_SHORT[s]), '', '', '', '', d(r.byScope[s])]);
     rows.push(['', q('Total'), '', '', '', '', d(r.total)]);
-    const head = `${q('Entité')};${q(p.name)}\n${q('Type')};${q(TYPES[state.type].label)}\n${q('Année')};${q(p.year)}\n${q('Facteur électricité (kgCO2e/kWh)')};${d(num(p.grid))}\n\n`;
+    const head = `${q('Entité')};${q(p.name)}\n${q('Type')};${q(TYPES[state.type].label)}\n${state.type === 'entreprise' && SECTORS[p.sector] ? `${q('Secteur')};${q(SECTORS[p.sector].label)}\n` : ''}${q('Année')};${q(p.year)}\n${q('Facteur électricité (kgCO2e/kWh)')};${d(num(p.grid))}\n\n`;
     download(`bilan-ges-${slug()}.csv`, '﻿' + head + rows.map(r => r.join(';')).join('\n'), 'text/csv;charset=utf-8');
   });
   $('b-json').addEventListener('click', () => {
@@ -1775,7 +2213,7 @@
     const r = compute(p, qp.type);
     const themes = THEMES.map(t => ({ l:t.l, e:t.e, tip:t.tip, kg:r.items.filter(i => t.ids.includes(i.id)).reduce((s, i) => s + i.kg, 0) }))
       .filter(t => t.kg > 0).sort((a, b) => b.kg - a.kg);
-    return { A, qp, r, themes };
+    return { A, qp, r, themes, p };
   }
 
   const SCOPE_EXPLAIN = {
@@ -1794,7 +2232,7 @@
 
   function renderQuizResult() {
     const qz = state.quiz, w = WHO[qz.who];
-    const { A, qp, r, themes } = quizResult();
+    const { A, qp, r, themes, p } = quizResult();
     const [v, u] = mass(r.total);
     const pp = massParts(r.total);
     const per = r.total / qp.pop;
@@ -1841,10 +2279,7 @@
         <ul class="themes">${themes.map((t, i) => `<li><span class="e ${TILES[i % TILES.length]}" aria-hidden="true">${t.e}</span><div><div class="t"><span>${esc(t.l)}</span><span>${massStr(t.kg)} · ${Math.round(t.kg / tot * 100)} %</span></div><div class="m"><i data-w="${(t.kg / themes[0].kg * 100).toFixed(1)}%" style="--d:${(i * 0.08).toFixed(2)}s"></i></div></div></li>`).join('') || '<li class="empty">Aucune émission estimée.</li>'}</ul>
       </section>
 
-      ${themes.length ? `<section class="sec" style="margin-top:56px">
-        <div class="sec-head" data-reveal><div class="mono">Vos priorités</div><h2 class="h-lg">Par où <em>commencer</em> ?</h2></div>
-        <ol class="tips">${themes.slice(0, 3).map((t, i) => `<li class="tile ${tipTiles[i]}" data-reveal style="--d:${(i * 0.12).toFixed(2)}s"><span class="e" aria-hidden="true">${t.e}</span><span class="mono">Priorité 0${i + 1}</span><h3>${esc(t.l)}</h3><p>${esc(t.tip)}</p></li>`).join('')}</ol>
-      </section>` : ''}
+      <section class="card advisor" id="quiz-advisor" data-reveal></section>
 
       <section class="card block" data-reveal>
         <div class="head"><h3 class="h-lg">Répartition <em>par scope</em></h3><span class="mono">GHG Protocol</span></div>
@@ -1861,6 +2296,8 @@
       </div>
       <p class="disclaimer">Estimation simplifiée à partir d’ordres de grandeur (tarifs moyens de l’électricité et du carburant, facteurs d’émission indicatifs). Pour un bilan précis, utilisez « Détail et affiner » et saisissez vos consommations réelles.</p>
     </div>`;
+    p.pop = qp.pop;
+    renderAdvice(quizView.querySelector('#quiz-advisor'), qp.type, p, r, { pop:qp.pop, limit:5 });
     setTimeout(() => activate(quizView.querySelector('.r-hero')), 200);
   }
 
