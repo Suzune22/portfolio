@@ -213,17 +213,19 @@
   .persona{
     position:absolute; bottom:0; left:50%; height:560px; padding:0; border:0; background:none; cursor:pointer;
     transform-origin:bottom center; -webkit-tap-highlight-color:transparent;
-    transition:transform 1s cubic-bezier(.7,0,.25,1), filter 1s ease, opacity 1s ease, z-index 0s .5s;
+    transition:transform .9s cubic-bezier(.65,0,.35,1), filter .9s ease, z-index 0s .45s;
   }
   .persona img{ height:100%; width:auto; display:block; pointer-events:none; user-select:none;
     filter:drop-shadow(0 26px 30px rgba(3,8,40,.55)); -webkit-mask-image:linear-gradient(180deg,#000 82%,transparent); mask-image:linear-gradient(180deg,#000 82%,transparent); }
   .persona.front{ z-index:3; transform:translateX(-38%) scale(1); filter:none; }
   .persona.back{ z-index:1; transform:translateX(-112%) translateY(-34px) scale(.74); filter:brightness(.55) saturate(.6) blur(1.2px); }
-  .persona.back:hover{ filter:brightness(.8) saturate(.85) blur(0); transform:translateX(-114%) translateY(-40px) scale(.77); }
-  .duo.swap .persona.front{ animation:comeFront 1s cubic-bezier(.7,0,.25,1); }
-  .duo.swap .persona.back{ animation:goBack 1s cubic-bezier(.7,0,.25,1); }
-  @keyframes comeFront{ 45%{ transform:translateX(-70%) translateY(-60px) scale(.9) rotate(-3deg); } }
-  @keyframes goBack{ 45%{ transform:translateX(-30%) translateY(20px) scale(.86) rotate(4deg); } }
+  @media (hover:hover){ .duo:not(.busy) .persona.back:hover{ filter:brightness(.8) saturate(.85) blur(0); } }
+  .pose{ display:block; height:100%; position:relative; }
+  /* petit arc pendant l'échange : celle qui passe devant monte puis redescend, l'autre s'enfonce un peu */
+  .persona.hop-up .pose{ animation:hopUp .9s cubic-bezier(.45,0,.55,1) 1; }
+  .persona.hop-down .pose{ animation:hopDown .9s cubic-bezier(.45,0,.55,1) 1; }
+  @keyframes hopUp{ 0%,100%{ transform:none; } 50%{ transform:translateY(-46px); } }
+  @keyframes hopDown{ 0%,100%{ transform:none; } 50%{ transform:translateY(14px); } }
   .persona .tag{
     position:absolute; left:50%; bottom:22px; transform:translateX(-50%); white-space:nowrap;
     display:inline-flex; align-items:center; gap:8px; padding:9px 15px; border-radius:999px;
@@ -254,7 +256,6 @@
     .duo{ height:500px; margin-top:20px; }
     .persona{ height:440px; }
     .persona.back{ transform:translateX(-100%) translateY(-24px) scale(.7); }
-    .persona.back:hover{ transform:translateX(-100%) translateY(-24px) scale(.7); }
     .persona.back .tag{ font-size:15px; }
     .persona .tag{ font-size:13.5px; padding:8px 12px; }
     .about-grid .badge-stage{ height:720px; }
@@ -495,12 +496,12 @@
       <div class="duo-ring" aria-hidden="true"></div>
       <div class="duo-disc" aria-hidden="true"></div>
       <button class="persona front" type="button" data-mode="pro" aria-pressed="true" aria-label="Volet professionnel : formation, stages, certificats, compétences">
-        <img src="profil-pro.webp" alt="Delon Boyou en costume" draggable="false" />
-        <span class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/></svg>Professionnel</span>
+        <span class="pose"><img src="profil-pro.webp" alt="Delon Boyou en costume" draggable="false" />
+        <span class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/></svg>Professionnel</span></span>
       </button>
       <button class="persona back" type="button" data-mode="projets" aria-pressed="false" aria-label="Volet projets et engagement : projets, vie associative, actions">
-        <img src="profil-projets.webp" alt="Delon Boyou en t-shirt" draggable="false" />
-        <span class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c4-3 8-6.5 8-11a8 8 0 0 0-16 0c0 4.5 4 8 8 11Z"/><path d="M12 7v6M9 10h6"/></svg>Projets &amp; engagement</span>
+        <span class="pose"><img src="profil-projets.webp" alt="Delon Boyou en t-shirt" draggable="false" />
+        <span class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c4-3 8-6.5 8-11a8 8 0 0 0-16 0c0 4.5 4 8 8 11Z"/><path d="M12 7v6M9 10h6"/></svg>Projets &amp; engagement</span></span>
       </button>
       <span class="duo-hint" id="duoHint">Cliquez sur l'autre photo pour changer de volet ⇄</span>
     </div>
@@ -966,11 +967,13 @@ document.documentElement.classList.add('js');
     opts = opts || {};
     if (m === mode && !opts.force) return;
     mode = m; document.body.setAttribute('data-mode', m);
+    duo.classList.add('busy'); clearTimeout(setMode.t); setMode.t = setTimeout(function(){ duo.classList.remove('busy'); }, 950);
     duo.querySelectorAll('.persona').forEach(function(b){
       var front = b.getAttribute('data-mode') === m;
+      b.classList.remove('hop-up', 'hop-down'); void b.offsetWidth;
+      if (!reduce) b.classList.add(front ? 'hop-up' : 'hop-down');
       b.classList.toggle('front', front); b.classList.toggle('back', !front); b.setAttribute('aria-pressed', front);
     });
-    duo.classList.remove('swap'); void duo.offsetWidth; duo.classList.add('swap');
     var c = MODES[m];
     [modeChip, heroIntro].forEach(function(el){ el.classList.remove('swap-text'); void el.offsetWidth; el.classList.add('swap-text'); });
     modeChip.textContent = c.chip; heroIntro.textContent = c.intro;
@@ -981,6 +984,7 @@ document.documentElement.classList.add('js');
   }
   duo.querySelectorAll('.persona').forEach(function(b){
     b.addEventListener('click', function(){
+      if (duo.classList.contains('busy')) return;
       var m = b.getAttribute('data-mode');
       setMode(m === mode ? (m === 'pro' ? 'projets' : 'pro') : m);
       document.getElementById('duoHint').classList.add('seen');
