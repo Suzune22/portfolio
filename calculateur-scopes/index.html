@@ -343,6 +343,49 @@
   .res-actions{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:12px; }
   .disclaimer{ font-size:13.5px; color:var(--fog); margin:6px auto 0; text-align:center; max-width:70ch; }
 
+  /* ---- bandeau du calcul détaillé : Terre et scènes ---- */
+  .scene-banner{ position:relative; overflow:hidden; isolation:isolate; border-radius:30px; background:#0b0c1c; min-height:clamp(470px,50vw,580px); margin-bottom:22px; }
+  .scene-banner .globe-wrap.banner{ position:absolute; inset:0; width:auto; max-width:none; aspect-ratio:auto; z-index:0; animation:fadein 1.4s var(--ease-long) .2s forwards; }
+  .scene-banner .page-head{ position:relative; z-index:3; pointer-events:none; padding-inline:20px; text-shadow:0 2px 18px rgba(11,12,28,.8); }
+  .scene-banner .page-head .lede{ color:#cfd3ea; }
+  .scene-banner::before{ content:""; position:absolute; inset:0; z-index:2; pointer-events:none; background:linear-gradient(180deg, rgba(11,12,28,.85) 0%, rgba(11,12,28,.35) 34%, rgba(11,12,28,0) 52%); }
+  .scene{ position:absolute; left:0; right:0; bottom:0; height:62%; z-index:1; opacity:0; transform:scale(1.35); transform-origin:50% 60%;
+    transition:opacity .8s var(--ease-long), transform 1.6s var(--ease-out); pointer-events:none; }
+  .scene.on{ opacity:1; transform:none; }
+  .scene svg{ width:100%; height:100%; display:block; }
+  .flash{ position:absolute; inset:0; z-index:1; pointer-events:none; opacity:0; background:radial-gradient(circle at 50% 58%, rgba(255,230,200,.95), rgba(255,230,200,0) 62%); }
+  .flash.go{ animation:flash 1s ease; }
+  @keyframes flash{ 0%{ opacity:0; } 35%{ opacity:.9; } 100%{ opacity:0; } }
+  .scene-tag{ position:absolute; left:18px; bottom:18px; z-index:3; padding:8px 16px; border-radius:9999px; color:var(--pure);
+    background:rgba(15,16,17,.6); border:1px solid rgba(255,255,255,.2); max-width:calc(100% - 36px); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; transition:opacity .4s ease; }
+  .scene-back{ position:absolute; right:16px; bottom:14px; z-index:4; background:rgba(15,16,17,.6); }
+  .scene-back[hidden]{ display:none; }
+  .scene-banner .globe-wrap.banner canvas{ transition:opacity .8s ease; }
+  .scene-banner.landed .globe-wrap.banner canvas{ opacity:0; }
+  .scene-banner.landed .scene-tag{ max-width:calc(100% - 230px); }
+  .scene-banner .page-head .lede{ transition:opacity .5s ease, transform .5s ease; }
+  .scene-banner.landed .page-head .lede{ opacity:0; transform:translateY(-8px); }
+  @media (max-width:640px){ .scene-banner{ min-height:600px; } .scene{ height:56%; } .scene-tag{ bottom:12px; left:12px; } .scene-banner.landed .scene-tag{ max-width:calc(100% - 200px); } .scene-back{ font-size:12px; padding:7px 11px; } }
+  /* animations des scènes */
+  .sc-cloud{ animation:sc-drift 46s linear infinite; animation-delay:var(--d); }
+  @keyframes sc-drift{ from{ transform:translateX(-300px); } to{ transform:translateX(1300px); } }
+  .sc-shimmer line{ animation:sc-shim 3s ease-in-out infinite alternate; }
+  .sc-shimmer line:nth-child(2n){ animation-delay:-1.5s; }
+  @keyframes sc-shim{ to{ transform:translateX(24px); opacity:.2; } }
+  .sc-blink{ animation:sc-blink 3.2s steps(1) infinite; animation-delay:var(--d, 0s); }
+  @keyframes sc-blink{ 50%{ fill:#2a2f6b; } }
+  .sc-smoke circle{ animation:sc-smoke 3.6s ease-out infinite; animation-delay:var(--d); transform-box:fill-box; transform-origin:center; opacity:0; }
+  @keyframes sc-smoke{ 0%{ transform:translate(0,0) scale(.5); opacity:.7; } 100%{ transform:translate(18px,-90px) scale(1.8); opacity:0; } }
+  .sc-swing{ transform-box:fill-box; transform-origin:36% 50%; animation:sc-swing 7s ease-in-out infinite alternate; }
+  @keyframes sc-swing{ from{ transform:rotate(-4deg); } to{ transform:rotate(5deg); } }
+  .sc-sway{ transform-box:fill-box; transform-origin:50% 100%; animation:sc-sway 4s ease-in-out infinite alternate; }
+  @keyframes sc-sway{ to{ transform:rotate(4deg); } }
+  .sc-drive{ animation:sc-drive 14s linear infinite; }
+  .sc-drive.sc-late{ animation-delay:-7s; }
+  @keyframes sc-drive{ from{ transform:translateX(-140px); } to{ transform:translateX(1260px); } }
+  .sc-flame{ transform-box:fill-box; transform-origin:50% 100%; animation:sc-flame .35s ease-in-out infinite alternate; }
+  @keyframes sc-flame{ to{ transform:scale(.85, 1.15); } }
+
   /* ---- conseiller ---- */
   .advisor, .adv-cta{ padding:clamp(24px,5vw,44px); margin-top:14px; }
   .adv-cta{ display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap; }
@@ -510,7 +553,8 @@
 
   @media print{
     body{ background:#fff; color:#000; }
-    .appbar, .quiz-nav, .res-actions, .tabs, .toolbar, .add-row, .del, details.method, .row.empty-row, footer, .marquee, .adv-cta, .adv-more{ display:none !important; }
+    .appbar, .quiz-nav, .res-actions, .tabs, .toolbar, .add-row, .del, details.method, .row.empty-row, footer, .marquee, .adv-cta, .adv-more, .scene-banner .globe-wrap, .scene, .scene-tag, .scene-back, .scene-banner .aurora, .scene-banner .stars{ display:none !important; }
+    .scene-banner{ min-height:0; background:none; }
     .advisor, .adv-msg, .adv-action{ background:#fff !important; color:#000; border-color:#ccc; }
     .adv-action h4, .adv-text{ color:#000; }
     .adv-action.more{ display:grid !important; }
@@ -546,10 +590,19 @@
 <div id="quiz-view"></div>
 
 <div id="detail-view">
+<div class="scene-banner" id="scene-banner">
+  <div class="aurora" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+  <div class="stars" aria-hidden="true"></div>
+  <div class="globe-wrap banner" id="banner-globe"><canvas aria-hidden="true"></canvas></div>
+  <div class="scene" id="scene" aria-hidden="true"></div>
+  <div class="flash" id="scene-flash" aria-hidden="true"></div>
 <div class="page-head">
-  <span class="pill mono">Experts · entreprises · collectivités</span>
-  <h1 class="display">Bilan <em>par scope</em></h1>
-  <p class="lede">Saisissez vos consommations réelles poste par poste. Chacune est multipliée par son facteur d'émission et classée dans le scope 1, 2 ou 3.</p>
+    <span class="pill mono">Experts · entreprises · collectivités</span>
+    <h1 class="display">Bilan <em>par scope</em></h1>
+    <p class="lede">Saisissez vos consommations réelles poste par poste. Chacune est multipliée par son facteur d'émission et classée dans le scope 1, 2 ou 3.</p>
+  </div>
+  <div class="scene-tag mono" id="scene-tag">↓ Choisissez un profil : la caméra plonge vers lui</div>
+  <button type="button" class="btn small ghost scene-back" id="scene-back" hidden>🌍 Revenir à la Terre</button>
 </div>
 
 <div class="tabs" role="radiogroup" aria-label="Type d'entité" id="tabs"></div>
@@ -1314,6 +1367,115 @@
     setTimeout(step, 700);
   }
 
+  // ---------- Scènes du bandeau : on « atterrit » sur le profil choisi ----------
+  // Illustrations SVG animées (viewBox 1200×520, sujet centré pour rester visible sur mobile).
+  const svgEsc = t => String(t).replace(/[&<>"]/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[ch]));
+  function sceneBase(inner) {
+    return `<svg viewBox="0 0 1200 520" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="sc-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#0b0c1c" stop-opacity="0"/><stop offset=".38" stop-color="#2b2468" stop-opacity=".85"/><stop offset=".74" stop-color="#b8679f"/><stop offset="1" stop-color="#f4b183"/>
+        </linearGradient>
+        <linearGradient id="sc-glass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#90b8f0"/><stop offset="1" stop-color="#4b49aa"/></linearGradient>
+      </defs>
+      <rect width="1200" height="520" fill="url(#sc-sky)"/>
+      <circle cx="960" cy="392" r="78" fill="#ffd2a6" opacity=".85"/>
+      <g class="sc-cloud" style="--d:0s"><ellipse cx="160" cy="250" rx="90" ry="22" fill="#fff" opacity=".22"/><ellipse cx="210" cy="238" rx="60" ry="20" fill="#fff" opacity=".22"/></g>
+      <g class="sc-cloud" style="--d:-18s"><ellipse cx="760" cy="200" rx="110" ry="24" fill="#fff" opacity=".16"/><ellipse cx="820" cy="186" rx="64" ry="20" fill="#fff" opacity=".16"/></g>
+      <rect y="404" width="1200" height="34" fill="#4b49aa"/>
+      <g class="sc-shimmer" stroke="#d1c9ff" stroke-width="2" stroke-linecap="round" opacity=".6">
+        <line x1="80" y1="418" x2="130" y2="418"/><line x1="330" y1="426" x2="370" y2="426"/><line x1="880" y1="416" x2="940" y2="416"/><line x1="1060" y1="428" x2="1100" y2="428"/>
+      </g>
+      <rect y="434" width="1200" height="86" fill="#2c6e5a"/>
+      <rect y="434" width="1200" height="8" fill="#93e0bd" opacity=".5"/>
+      ${inner}
+    </svg>`;
+  }
+  const palm = (x, s = 1) => `<g transform="translate(${x} 434) scale(${s})">
+      <path d="M0 0 C 6 -40 -4 -80 6 -120" stroke="#8a5a3c" stroke-width="9" fill="none" stroke-linecap="round"/>
+      <g class="sc-sway" fill="#3fae7f"><path d="M6 -120 C -30 -140 -60 -120 -80 -96 C -50 -112 -24 -114 6 -116Z"/><path d="M6 -120 C 40 -146 70 -128 92 -104 C 60 -118 34 -118 6 -116Z"/>
+      <path d="M6 -120 C -10 -160 20 -176 40 -168 C 22 -160 12 -144 8 -122Z"/><path d="M6 -120 C -40 -168 -70 -150 -76 -140 C -50 -150 -24 -140 6 -118Z"/></g></g>`;
+  const person = (x, s = 1, shirt = '#dd90d8') => `<g transform="translate(${x} 434) scale(${s})">
+      <rect x="-11" y="-52" width="22" height="38" rx="10" fill="${shirt}"/><rect x="-9" y="-18" width="7" height="18" rx="3" fill="#13151c"/><rect x="2" y="-18" width="7" height="18" rx="3" fill="#13151c"/>
+      <circle cy="-64" r="11" fill="#7a4b33"/></g>`;
+  const windows = (x0, y0, cols, rows, w, h, gx, gy) => {
+    let o = '';
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+      const lit = (r * 7 + c * 3) % 5 < 3;
+      o += `<rect x="${x0 + c * gx}" y="${y0 + r * gy}" width="${w}" height="${h}" rx="2" fill="${lit ? '#ffd88a' : '#2a2f6b'}"${lit && (r + c) % 4 === 0 ? ` class="sc-blink" style="--d:${(r + c) % 5 * 0.7}s"` : ''}/>`;
+    }
+    return o;
+  };
+  const smoke = (x, y) => `<g class="sc-smoke" fill="#e9e6f5">${[0, 1, 2].map(i => `<circle cx="${x}" cy="${y}" r="${10 + i * 4}" style="--d:${i * 1.2}s"/>`).join('')}</g>`;
+  const sign = (x, y, text) => {
+    const t = svgEsc(String(text || 'Votre entreprise').slice(0, 22)), w = Math.max(150, t.length * 15 + 40);
+    return `<g transform="translate(${x - w / 2} ${y})"><rect width="${w}" height="44" rx="12" fill="#0f1011" stroke="#d1c9ff" stroke-width="2"/>
+      <circle cx="22" cy="22" r="8" fill="#00b3dd"/><text x="${w / 2 + 10}" y="29" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="22" fill="#fff">${t}</text></g>`;
+  };
+  const truck = (cls, y, color = '#f4b183') => `<g class="${cls}"><g transform="translate(0 ${y})"><rect x="0" y="-34" width="70" height="30" rx="4" fill="${color}"/><rect x="70" y="-26" width="26" height="22" rx="4" fill="#847dff"/>
+      <circle cx="18" cy="0" r="7" fill="#13151c"/><circle cx="78" cy="0" r="7" fill="#13151c"/></g></g>`;
+
+  const SECTOR_PROPS = {
+    btp: () => `<g><rect x="300" y="300" width="130" height="134" fill="#3f4041"/>${windows(312, 312, 4, 4, 18, 18, 30, 30).replace(/#ffd88a|#2a2f6b/g, '#6a6b6b')}
+        <path d="M300 300 h130 M300 334 h130 M300 368 h130 M300 402 h130 M332 300 v134 M366 300 v134 M398 300 v134" stroke="#f4b183" stroke-width="3"/></g>
+      <g><rect x="246" y="150" width="12" height="284" fill="#f4b183"/><path d="M246 150 l6 -14 l6 14" fill="#f4b183"/>
+        <g class="sc-swing"><rect x="170" y="150" width="240" height="10" fill="#f4b183"/><line x1="380" y1="160" x2="380" y2="250" stroke="#d1c9ff" stroke-width="2"/><rect x="368" y="250" width="24" height="14" fill="#847dff"/></g></g>`,
+    mines: () => `<path d="M140 434 L200 380 H300 L340 350 H460 L500 434Z" fill="#b8865b"/><path d="M200 380 H300 L340 350 H460" stroke="#d9a877" stroke-width="4" fill="none"/>
+      <g transform="translate(860 434)"><path d="M-50 0 L0 -170 L50 0" stroke="#d1c9ff" stroke-width="7" fill="none"/><circle cy="-170" r="18" fill="none" stroke="#f4b183" stroke-width="6"/><line x1="-28" y1="-80" x2="28" y2="-80" stroke="#d1c9ff" stroke-width="5"/></g>
+      ${truck('sc-drive', 428, '#f4b183')}`,
+    energie: () => `<g transform="translate(250 434)"><rect x="0" y="-120" width="150" height="120" fill="#3f4041"/><rect x="20" y="-210" width="26" height="90" fill="#cacaca"/><rect x="66" y="-190" width="26" height="70" fill="#cacaca"/>${smoke(33, -220)}${smoke(79, -200)}</g>
+      <g transform="translate(880 434)"><rect x="-6" y="-200" width="12" height="200" fill="#cacaca"/><path class="sc-flame" d="M0 -200 C -18 -226 -6 -244 0 -262 C 8 -244 20 -226 0 -200Z" fill="#ff9a3d"/></g>
+      <g stroke="#d1c9ff" stroke-width="3" fill="none"><path d="M60 434 L80 330 L100 434 M70 380 H90"/><path d="M1100 434 L1120 330 L1140 434 M1110 380 H1130"/><path d="M80 332 Q 600 380 1120 332" stroke-width="1.5" opacity=".7"/></g>`,
+    industrie: () => `<g transform="translate(250 434)"><path d="M0 0 V-90 L40 -120 V-90 L80 -120 V-90 L120 -120 V-90 L160 -120 V0Z" fill="#3f4041"/><rect x="120" y="-200" width="24" height="110" fill="#cacaca"/>${smoke(132, -210)}
+        ${windows(14, -70, 5, 2, 18, 14, 28, 26)}</g>
+      <g transform="translate(860 434)"><rect x="-60" y="-110" width="120" height="110" fill="#3f4041"/><rect x="40" y="-170" width="20" height="60" fill="#cacaca"/>${smoke(50, -180)}${windows(-48, -96, 3, 3, 22, 16, 34, 28)}</g>`,
+    agri: () => `<g>${[0, 1, 2, 3, 4].map(i => `<path d="M${120 + i * 40} 434 L${260 + i * 40} 404" stroke="${i % 2 ? '#93e0bd' : '#d9c46a'}" stroke-width="10"/>`).join('')}</g>
+      <g transform="translate(900 434)"><rect x="-26" y="-150" width="52" height="150" rx="6" fill="#cacaca"/><path d="M-26 -150 Q 0 -190 26 -150Z" fill="#847dff"/></g>
+      <g class="sc-drive"><g transform="translate(0 428)"><rect x="0" y="-30" width="50" height="22" rx="4" fill="#dd90d8"/><rect x="34" y="-50" width="20" height="22" rx="3" fill="#90b8f0"/><circle cx="12" cy="-4" r="12" fill="#13151c"/><circle cx="46" cy="-2" r="8" fill="#13151c"/></g></g>`,
+    transport: () => `<g transform="translate(240 434)"><rect x="0" y="-110" width="220" height="110" fill="#3f4041"/><path d="M0 -110 L110 -150 L220 -110Z" fill="#4b49aa"/>
+        ${[0, 1, 2].map(i => `<rect x="${20 + i * 68}" y="-70" width="50" height="70" fill="#6a6b6b"/>`).join('')}</g>
+      ${truck('sc-drive', 428, '#00b3dd')}${truck('sc-drive sc-late', 428, '#dd90d8')}`,
+    services: () => `<g transform="translate(250 434)"><rect x="0" y="-130" width="110" height="130" fill="#3f4041"/>${windows(12, -118, 3, 4, 22, 18, 32, 30)}</g>
+      <g transform="translate(830 434)"><rect x="0" y="-90" width="160" height="90" fill="#3f4041"/><path d="M-6 -90 h172 l-12 -22 h-148z" fill="#dd90d8"/>${windows(14, -70, 4, 2, 24, 22, 36, 34)}</g>`,
+  };
+
+  function sceneSVG(type, p) {
+    switch (type) {
+      case 'individu':
+        return sceneBase(`${palm(360, 1.1)}${palm(880, .9)}
+          <g transform="translate(600 434)"><rect x="-90" y="-120" width="180" height="120" fill="#f4b183"/><path d="M-110 -116 L0 -190 L110 -116Z" fill="#847dff"/>
+          <rect x="-22" y="-70" width="44" height="70" rx="4" fill="#4b49aa"/><rect x="-74" y="-92" width="38" height="34" rx="3" fill="#ffd88a" class="sc-blink" style="--d:.4s"/><rect x="38" y="-92" width="38" height="34" rx="3" fill="#ffd88a"/></g>
+          ${person(700, 1.15, '#00b3dd')}`);
+      case 'foyer':
+        return sceneBase(`${palm(300, 1.1)}${palm(930, 1)}
+          <g transform="translate(560 434)"><rect x="-150" y="-150" width="300" height="150" fill="#dd90d8"/><path d="M-176 -146 L0 -236 L176 -146Z" fill="#4b49aa"/>
+          <rect x="-26" y="-84" width="52" height="84" rx="4" fill="#0f1011"/>${windows(-126, -122, 2, 1, 46, 40, 60, 0)}${windows(66, -122, 2, 1, 46, 40, 60, 0)}
+          <path d="M-150 -40 H150" stroke="#f4b183" stroke-width="3" opacity=".6"/></g>
+          ${person(760, 1.2, '#93e0bd')}${person(800, 1.1, '#f4b183')}${person(836, .75, '#847dff')}${person(864, .62, '#00b3dd')}`);
+      case 'communaute': {
+        const hut = (x, s, wall, roof) => `<g transform="translate(${x} 434) scale(${s})"><rect x="-60" y="-80" width="120" height="80" rx="16" fill="${wall}"/><path d="M-80 -74 L0 -150 L80 -74Z" fill="${roof}"/><rect x="-16" y="-50" width="32" height="50" rx="14" fill="#0f1011"/></g>`;
+        return sceneBase(`${hut(330, 1, '#f4b183', '#d9a877')}${hut(500, .85, '#dd90d8', '#d9a877')}${hut(860, 1.05, '#90b8f0', '#d9a877')}
+          <g transform="translate(680 434)"><rect x="-14" y="-120" width="28" height="120" fill="#8a5a3c"/><ellipse cy="-150" rx="120" ry="58" fill="#3fae7f"/><ellipse cx="-50" cy="-176" rx="70" ry="40" fill="#5cc48f"/><ellipse cx="60" cy="-172" rx="64" ry="38" fill="#4fb985"/></g>
+          ${person(620, 1, '#847dff')}${person(650, .9, '#00b3dd')}${person(730, 1, '#f4b183')}
+          <g transform="translate(420 434)"><path d="M-14 0 L0 -14 L14 0Z" fill="#ff9a3d" class="sc-flame"/>${smoke(0, -24)}</g>`);
+      }
+      case 'localite':
+        return sceneBase(`<g fill="#3f4041">
+            <rect x="330" y="230" width="70" height="204"/><rect x="410" y="180" width="60" height="254"/><rect x="480" y="260" width="80" height="174"/><rect x="570" y="210" width="56" height="224"/><rect x="636" y="150" width="70" height="284"/><rect x="716" y="250" width="90" height="184"/><rect x="816" y="220" width="60" height="214"/></g>
+          ${windows(340, 244, 2, 6, 18, 14, 28, 28)}${windows(420, 196, 2, 8, 16, 14, 24, 28)}${windows(646, 166, 2, 9, 18, 14, 30, 28)}${windows(728, 264, 3, 5, 16, 14, 26, 28)}
+          <path d="M0 404 H1200" stroke="#cacaca" stroke-width="6"/><g stroke="#cacaca" stroke-width="3">${[0, 1, 2, 3, 4, 5, 6, 7].map(i => `<line x1="${i * 160 + 40}" y1="404" x2="${i * 160 + 40}" y2="438"/>`).join('')}</g>
+          <g class="sc-drive"><rect x="0" y="390" width="34" height="12" rx="4" fill="#ff9a3d"/></g><g class="sc-drive sc-late"><rect x="0" y="390" width="34" height="12" rx="4" fill="#00b3dd"/></g>
+          ${palm(200, .9)}${palm(1000, 1)}`);
+      default: { // entreprise
+        const props = (SECTOR_PROPS[p.sector] || SECTOR_PROPS.services)();
+        return sceneBase(`${props}
+          <g transform="translate(600 434)"><rect x="-80" y="-230" width="160" height="230" fill="url(#sc-glass)"/>${windows(-66, -214, 4, 7, 22, 18, 34, 30)}
+          <rect x="-24" y="-46" width="48" height="46" fill="#0f1011"/></g>
+          ${sign(600, 150, p.name || 'Votre entreprise')}`);
+      }
+    }
+  }
+
   // ---------- Rendu ----------
   const $ = id => document.getElementById(id);
   const form = $('form');
@@ -1456,11 +1618,52 @@
 
   function renderAll() { renderTabs(); renderSettings(); renderForm(); renderResults(); }
 
+  // ---------- Bandeau : zoom de la Terre vers le profil choisi ----------
+  let bannerGlobe = null;   // créé à la fin de l'initialisation, une fois les points de la Terre chargés
+  let sceneToken = 0;
+  function sceneLabel(type, p) {
+    const base = { individu:'Une personne', foyer:'Un foyer', communaute:'Une communauté', entreprise:'Une entreprise', localite:'Une localité' }[type];
+    const sc = type === 'entreprise' && SECTORS[p.sector] ? ` · ${SECTORS[p.sector].label}` : '';
+    return `📍 Abidjan, Côte d’Ivoire · ${p.name ? esc(p.name) : base}${sc}`;
+  }
+  function paintScene() {
+    $('scene').innerHTML = sceneSVG(state.type, prof());
+    $('scene-tag').innerHTML = sceneLabel(state.type, prof());
+  }
+  function goScene() {
+    const sc = $('scene'), token = ++sceneToken;
+    const land = () => {
+      if (token !== sceneToken) return;
+      paintScene();
+      const fl = $('scene-flash'); fl.classList.remove('go'); void fl.offsetWidth; fl.classList.add('go');
+      sc.classList.add('on'); $('scene-banner').classList.add('landed');
+      $('scene-back').hidden = false;
+      setTimeout(() => { if (token === sceneToken) bannerGlobe?.cover(true); }, 900);
+    };
+    $('scene-tag').textContent = '✈️ Zoom vers Abidjan…';
+    if (!bannerGlobe) { land(); return; }
+    if (sc.classList.contains('on')) {
+      sc.classList.remove('on'); bannerGlobe.cover(false); $('scene-banner').classList.remove('landed');
+      setTimeout(() => { if (token === sceneToken) bannerGlobe.flyOut(() => bannerGlobe.flyIn(land)); }, REDUCE ? 0 : 350);
+    } else bannerGlobe.flyIn(land);
+  }
+  function backToEarth() {
+    ++sceneToken;
+    $('scene').classList.remove('on'); $('scene-back').hidden = true; $('scene-banner').classList.remove('landed');
+    $('scene-tag').textContent = '↓ Choisissez un profil : la caméra plonge vers lui';
+    bannerGlobe?.cover(false); bannerGlobe?.flyOut();
+  }
+  $('scene-back').addEventListener('click', backToEarth);
+  const refreshScene = () => setTimeout(() => { if ($('scene').classList.contains('on')) paintScene(); }, 0);
+  $('f-sector').addEventListener('change', refreshScene);
+  $('f-name').addEventListener('input', refreshScene);
+
   // ---------- Événements ----------
   $('tabs').addEventListener('click', e => {
     const b = e.target.closest('[data-type]');
-    if (!b || b.dataset.type === state.type) return;
-    state.type = b.dataset.type; save(); renderAll(); $('detail-advisor').hidden = true;
+    if (!b) return;
+    if (b.dataset.type === state.type) { goScene(); return; }
+    state.type = b.dataset.type; save(); renderAll(); $('detail-advisor').hidden = true; goScene();
     $('b-advise').innerHTML = 'Analyser mes résultats <span class="arr">→</span>';
     $('tabs').querySelector(`[data-type="${state.type}"]`).focus();
   });
@@ -1469,7 +1672,7 @@
     const keys = TAB_ORDER;
     const d = (e.key === 'ArrowLeft' || e.key === 'ArrowUp') ? -1 : 1;
     state.type = keys[(keys.indexOf(state.type) + d + keys.length) % keys.length];
-    e.preventDefault(); save(); renderAll();
+    e.preventDefault(); save(); renderAll(); goScene();
     $('tabs').querySelector(`[data-type="${state.type}"]`).focus();
   });
 
@@ -1878,11 +2081,10 @@
     return Math.floor(((t % 1) + 1) % 1 * HUES) % HUES;
   }
   let landDots = null, ciDots = null, landHue = null;
-  let globeStop = null;
-
-  function mountGlobe(wrap) {
-    if (globeStop) globeStop();
-    if (!wrap) return;
+  // opts.banner : demi-Terre posée en bas d'un bandeau, capable de « plonger » vers Abidjan.
+  function mountGlobe(wrap, opts = {}) {
+    if (!wrap) return null;
+    if (wrap._stop) wrap._stop();
     if (!landDots) {
       landDots = decodeDots(EARTH_DOTS); ciDots = decodeDots(CI_DOTS);
       landHue = Uint8Array.from({ length:landDots.n }, (_, i) => dotHue(landDots.lon[i], landDots.lat[i]));
@@ -1894,7 +2096,9 @@
     const ORBIT = ['🚗', '💡', '🍳', '✈️', '🌳', '🛵'];
     const ORBIT_C = ['#847dff', '#f4b183', '#dd90d8', '#90b8f0', '#93e0bd', '#00b3dd'];
     let W = 0, H = 0, R = 0, cx = 0, cy = 0, dpr = 1;
-    let rotLon = 4 * D2R, rotLat = 14 * D2R;           // centré sur la Côte d'Ivoire
+    const banner = !!opts.banner, ZOOM = 9;
+    let rotLon = 4 * D2R, rotLat = (banner ? -24 : 14) * D2R;   // la Côte d'Ivoire bien visible
+    let baseR = 0, baseCy = 0, zp = 0, anim = null, covered = false;
     let vLon = 0, vLat = 0, dragging = false, lastX = 0, lastY = 0, lastMove = 0, idleSince = 0, interacted = false;
     let visible = true, raf = 0, t0 = performance.now();
     const buckets = Array.from({ length:HUES * DEPTHS }, () => []);
@@ -1904,8 +2108,11 @@
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       W = r.width; H = r.height;
       canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
-      R = Math.min(W, H) * 0.365; cx = W / 2; cy = H / 2;
+      if (banner) { baseR = Math.max(W * 0.34, H * 0.62); baseCy = H + baseR * 0.36; }
+      else { baseR = Math.min(W, H) * 0.365; baseCy = H / 2; }
+      cx = W / 2;
     }
+    const easeIO = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
     // Projection orthographique : rotation autour de l'axe des pôles puis inclinaison.
     function project(lon, lat) {
       const cl = Math.cos(lat), l = lon + rotLon;
@@ -1935,7 +2142,18 @@
       raf = requestAnimationFrame(frame);
       if (!visible || document.hidden) return;
       const time = now - t0;
-      if (!dragging) {
+      if (anim) {
+        const k = Math.min(1, (now - anim.t0) / anim.dur), e = easeIO(k);
+        zp = anim.from.zp + (anim.to.zp - anim.from.zp) * e;
+        rotLon = anim.from.lon + (anim.to.lon - anim.from.lon) * e;
+        rotLat = anim.from.lat + (anim.to.lat - anim.from.lat) * e;
+        if (k >= 1) { const done = anim.done; anim = null; idleSince = now; done && done(); }
+      }
+      // Zoom exponentiel : la Terre grossit en gardant Abidjan au centre du bandeau.
+      R = baseR * Math.pow(ZOOM, zp);
+      cy = baseCy + (H * 0.56 - baseCy) * Math.min(1, zp * 1.6);
+      if (covered) { if (!covered.cleared) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height); covered = { cleared:true }; } return; }
+      if (!dragging && !anim && zp === 0) {
         if (Math.abs(vLon) > 1e-5 || Math.abs(vLat) > 1e-5) {
           rotLon += vLon; rotLat = Math.max(-1.2, Math.min(1.2, rotLat + vLat));
           vLon *= 0.94; vLat *= 0.94;
@@ -1952,7 +2170,7 @@
       g.addColorStop(0, 'rgba(0,179,221,.55)'); g.addColorStop(.35, 'rgba(132,125,255,.22)'); g.addColorStop(1, 'rgba(132,125,255,0)');
       ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, R * 1.3, 0, Math.PI * 2); ctx.fill();
 
-      drawOrbit(time, false);
+      if (!banner) drawOrbit(time, false);
 
       // océan
       g = ctx.createRadialGradient(cx - R * 0.35, cy - R * 0.4, R * 0.05, cx, cy, R);
@@ -1972,15 +2190,17 @@
       }
 
       // terres émergées, dessinées par lots (teinte × profondeur)
-      const base = Math.max(1.3, R / 118);
+      const base = Math.min(10, Math.max(1.3, R / 118));
       const cs = Math.cos(rotLat), sn = Math.sin(rotLat);
       for (const b of buckets) b.length = 0;
       for (let i = 0; i < landDots.n; i++) {
         const lat = landDots.lat[i], cl = Math.cos(lat), l = landDots.lon[i] + rotLon;
         const z0 = cl * Math.cos(l), y0 = Math.sin(lat), z = y0 * sn + z0 * cs;
         if (z <= 0.02) continue;
+        const px = cx + cl * Math.sin(l) * R, py = cy - (y0 * cs - z0 * sn) * R;
+        if (px < -20 || px > W + 20 || py < -20 || py > H + 20) continue;
         const d = Math.min(DEPTHS - 1, Math.floor(z * DEPTHS));
-        buckets[d * HUES + landHue[i]].push(cx + cl * Math.sin(l) * R, cy - (y0 * cs - z0 * sn) * R);
+        buckets[d * HUES + landHue[i]].push(px, py);
       }
       for (let d = 0; d < DEPTHS; d++) {
         const zz = (d + 0.5) / DEPTHS, r = base * (0.7 + 0.5 * zz);
@@ -2011,11 +2231,11 @@
       g.addColorStop(0, 'rgba(255,255,255,.12)'); g.addColorStop(.55, 'rgba(8,10,30,0)'); g.addColorStop(1, 'rgba(5,6,22,.38)');
       ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
 
-      drawOrbit(time, true);
+      if (!banner) drawOrbit(time, true);
 
       // repère Abidjan
       const [ax, ay, az] = project(ABJ.lon, ABJ.lat);
-      if (az > 0.15) {
+      if (az > 0.15 && zp < 0.45) {
         const px = cx + ax * R, py = cy - ay * R;
         const pulse = REDUCE ? 0.5 : (time % 2200) / 2200;
         ctx.strokeStyle = `rgba(255,154,61,${1 - pulse})`; ctx.lineWidth = 2;
@@ -2040,6 +2260,7 @@
       interacted = true; hint?.classList.add('gone');
     }
     function onDown(e) {
+      if (zp > 0 || anim) return;
       dragging = true; lastX = e.clientX; lastY = e.clientY; lastMove = performance.now(); vLon = vLat = 0;
       canvas.setPointerCapture?.(e.pointerId); firstTouch();
     }
@@ -2078,9 +2299,27 @@
 
     function stop() {
       cancelAnimationFrame(raf); ro.disconnect(); io?.disconnect();
-      if (globeStop === stop) globeStop = null;
+      if (wrap._stop === stop) wrap._stop = null;
     }
-    globeStop = stop;
+    wrap._stop = stop;
+
+    // Pilotage du zoom depuis l'extérieur (bandeau du calcul détaillé).
+    const nearest = (target, from) => target + 2 * Math.PI * Math.round((from - target) / (2 * Math.PI));
+    return {
+      flyIn(done) {
+        covered = false;
+        if (REDUCE) { zp = 1; rotLon = nearest(-ABJ.lon, rotLon); rotLat = ABJ.lat; done && done(); return; }
+        vLon = vLat = 0;
+        anim = { t0:performance.now(), dur:1700, from:{ zp, lon:rotLon, lat:rotLat }, to:{ zp:1, lon:nearest(-ABJ.lon, rotLon), lat:ABJ.lat }, done };
+      },
+      flyOut(done) {
+        covered = false;
+        if (REDUCE) { zp = 0; rotLat = (banner ? -24 : 14) * D2R; done && done(); return; }
+        anim = { t0:performance.now(), dur:900, from:{ zp, lon:rotLon, lat:rotLat }, to:{ zp:0, lon:rotLon - 0.5, lat:(banner ? -24 : 14) * D2R }, done };
+      },
+      cover(v) { covered = v ? (covered || true) : false; },
+      get zoomed() { return zp > 0.99; },
+    };
   }
 
   const TILES = ['t-iris', 't-orchid', 't-peri', 't-apricot', 't-mint', 't-pale', 't-cyan'];
@@ -2503,6 +2742,7 @@
 
   // Chaque visite s'ouvre sur l'accueil (avec la Terre) ; le bandeau « Reprendre » ou
   // « Voir le résultat » ramène au questionnaire en cours. Seul le lien #detail ouvre le calcul détaillé.
+  bannerGlobe = mountGlobe($('banner-globe'), { banner:true });
   state.mode = location.hash === '#detail' ? 'detail' : 'quiz';
   state.quiz.view = 'start';
   renderAll();
