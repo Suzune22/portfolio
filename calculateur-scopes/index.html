@@ -2064,8 +2064,10 @@
     setMode('quiz'); renderQuiz();
   });
 
-  if (location.hash === '#detail') state.mode = 'detail';
-  else if (location.hash === '#questionnaire') state.mode = 'quiz';
+  // Chaque visite s'ouvre sur l'accueil (avec la Terre) ; le bandeau « Reprendre » ou
+  // « Voir le résultat » ramène au questionnaire en cours. Seul le lien #detail ouvre le calcul détaillé.
+  state.mode = location.hash === '#detail' ? 'detail' : 'quiz';
+  state.quiz.view = 'start';
   renderAll();
   renderQuiz();
   setMode(state.mode, false);
