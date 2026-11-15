@@ -364,6 +364,10 @@
   .flash.go{ animation:flash 1s ease; }
   @keyframes flash{ 0%{ opacity:0; } 35%{ opacity:.9; } 100%{ opacity:0; } }
   .scene-banner .globe-wrap.banner canvas{ transition:opacity .8s ease; }
+  /* Terre réaliste en 3D (WebGL) : remplace le globe en points dès que ses textures sont chargées. */
+  .earth3d{ position:absolute; inset:0; z-index:0; opacity:0; transition:opacity 1.2s ease; }
+  .scene-banner.has3d .earth3d{ opacity:1; }
+  .scene-banner.has3d .globe-wrap.banner, .scene-banner.has3d .scene, .scene-banner.has3d .aurora, .scene-banner.has3d .stars{ display:none; }
   .scene-banner.landed .globe-wrap.banner canvas{ opacity:0; }
   .scene-banner .page-head .lede{ transition:opacity .5s ease, transform .5s ease; }
   .scene-banner.landed .page-head .lede{ opacity:0; transform:translateY(-8px); }
@@ -597,6 +601,7 @@
   <div class="aurora" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
   <div class="stars" aria-hidden="true"></div>
   <div class="globe-wrap banner" id="banner-globe"><canvas aria-hidden="true"></canvas></div>
+  <div class="earth3d" id="banner-earth3d"></div>
   <div class="scene" id="scene" aria-hidden="true"></div>
   <div class="flash" id="scene-flash" aria-hidden="true"></div>
 <div class="page-head">
@@ -1699,7 +1704,14 @@
   function paintScene() {
     $('scene').innerHTML = sceneSVG(state.type, prof());
   }
+  let earth3d = null, earth3dReady = false;
   function goScene() {
+    if (earth3dReady) {
+      const p = prof(), token = ++sceneToken;
+      $('scene-banner').classList.add('landed'); $('scene-banner').title = '';
+      earth3d.flyTo(state.type, p.sector, p.name, () => { if (token === sceneToken) $('scene-banner').title = 'Cliquer pour revenir à la Terre'; });
+      return;
+    }
     const sc = $('scene'), token = ++sceneToken;
     const land = () => {
       if (token !== sceneToken) return;
@@ -1717,11 +1729,17 @@
   }
   function backToEarth() {
     ++sceneToken;
+    if (earth3dReady) { $('scene-banner').classList.remove('landed'); $('scene-banner').title = ''; earth3d.back(); return; }
     $('scene').classList.remove('on'); $('scene-banner').classList.remove('landed'); $('scene-banner').title = '';
     bannerGlobe?.cover(false); bannerGlobe?.flyOut();
   }
-  $('scene-banner').addEventListener('click', () => { if ($('scene-banner').classList.contains('landed')) backToEarth(); });
-  const refreshScene = () => setTimeout(() => { if ($('scene').classList.contains('on')) paintScene(); }, 0);
+  $('scene-banner').addEventListener('click', () => {
+    if (earth3dReady ? earth3d.phase === 'city' : $('scene-banner').classList.contains('landed')) backToEarth();
+  });
+  const refreshScene = () => setTimeout(() => {
+    if (earth3dReady) { const p = prof(); earth3d.refresh(state.type, p.sector, p.name); }
+    else if ($('scene').classList.contains('on')) paintScene();
+  }, 0);
   $('f-sector').addEventListener('change', refreshScene);
   $('f-name').addEventListener('input', refreshScene);
 
@@ -2810,6 +2828,18 @@
   // Chaque visite s'ouvre sur l'accueil (avec la Terre) ; le bandeau « Reprendre » ou
   // « Voir le résultat » ramène au questionnaire en cours. Seul le lien #detail ouvre le calcul détaillé.
   bannerGlobe = mountGlobe($('banner-globe'), { banner:true });
+  // Terre réaliste en 3D, chargée à part (module) ; en cas d'échec, le globe en points reste en place.
+  // (Les modules ne se chargent pas depuis un fichier ouvert en local : on garde alors le globe en points.)
+  if (location.protocol !== 'file:') import('./earth3d.js').then(m => {
+    earth3d = m.mountEarth3D($('banner-earth3d'), {
+      assetBase:'textures/', reducedMotion:REDUCE,
+      onReady:() => {
+        earth3dReady = true; ++sceneToken;
+        $('scene').classList.remove('on'); $('scene-banner').classList.remove('landed'); $('scene-banner').classList.add('has3d');
+        bannerGlobe?.cover(true);
+      },
+    });
+  }).catch(() => {});
   state.mode = location.hash === '#detail' ? 'detail' : 'quiz';
   state.quiz.view = 'start';
   renderAll();
