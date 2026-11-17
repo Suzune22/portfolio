@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8" /><title>Planche A4 — cartes QR</title>
+<style>
+  /* A4 : 10 cartes 85 × 55 mm (2 colonnes × 5 lignes), traits de coupe gris clair. Page 1 recto, page 2 verso. */
+  @page{ size:A4; margin:0; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .sheet{ width:210mm; height:297mm; display:grid; grid-template-columns:repeat(2,85mm); grid-template-rows:repeat(5,55mm);
+    justify-content:center; align-content:center; break-after:page; }
+  .sheet img{ width:85mm; height:55mm; display:block; outline:.1mm solid #d0d0d0; }
+</style></head>
+<body>
+<div class="sheet" id="r"></div>
+<div class="sheet" id="v"></div>
+<script>
+  for (var i = 0; i < 10; i++){
+    document.getElementById('r').insertAdjacentHTML('beforeend', '<img src="carte-recto.png" alt="" />');
+    document.getElementById('v').insertAdjacentHTML('beforeend', '<img src="carte-verso.png" alt="" />');
+  }
+</script>
+</body></html>
