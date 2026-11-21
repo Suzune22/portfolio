@@ -295,7 +295,7 @@
   .quote-band p{ color:var(--muted); font-size:1.05rem; margin:12px 0 0; }
   .assoc{ display:flex; flex-direction:column; gap:10px; }
   .assoc div{ display:flex; gap:12px; align-items:center; padding:12px 14px; border-radius:10px; background:rgba(255,255,255,.05); border:1px solid var(--line); font-size:1.02rem; }
-  .assoc b{ font-family:var(--font-mono); font-size:12px; letter-spacing:.1em; color:var(--ochre); flex:none; width:84px; }
+  .assoc b{ font-family:var(--font-mono); font-size:12px; letter-spacing:.1em; color:var(--ochre); flex:none; width:122px; }
   @media (max-width:760px){ .quote-band{ grid-template-columns:1fr; padding:22px; } }
 
   /* ---------- portfolio : onglets ---------- */
@@ -663,10 +663,10 @@
       <div class="quote-band glass" style="margin-top:0">
         <div>
           <h3>Un peu de terrain.<br /><span>Beaucoup d'idées.</span></h3>
-          <p>Président de l'AE-GMPE, je travaille à rapprocher les étudiants de la filière des professionnels du secteur minier : journée de rencontre en préparation, démarches auprès de la Chambre des Mines, de la SIR et de la GIZ, programme de parrainage des étudiants de L1.</p>
+          <p>Vice-président de l'AE-GMPE, je travaille à rapprocher les étudiants de la filière des professionnels du secteur minier : journée de rencontre en préparation, démarches auprès de la Chambre des Mines, de la SIR et de la GIZ, programme de parrainage des étudiants de L1.</p>
         </div>
       <div class="assoc">
-        <div><b>PRÉSIDENT</b>AE-GMPE Loko — Association des Étudiants en Géologie, Mines, Pétrole et Environnement</div>
+        <div><b>VICE-PRÉSIDENT</b>AE-GMPE Loko — Association des Étudiants en Géologie, Mines, Pétrole et Environnement</div>
         <div><b>MEMBRE</b>FEMICI</div>
         <div><b>ANIMATEUR</b>Fresque du Climat</div>
         <div><b>AMBASSADEUR</b>Fix My Food</div>
@@ -815,7 +815,7 @@ document.documentElement.classList.add('js');
       gen:{ from:'#6b3a12', to:'#1a1030', label:'AE-GMPE · UTT LOKO',
             icon:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M14 20c0-2.5 1.5-4.5 4-4.5s3 1.5 3 4.5"/>' },
       short:"Une journée de rencontre directe entre les étudiants de la filière et les employeurs du secteur minier.",
-      lead:"Projet porté par l'Association des Étudiants GMPE de l'Université UTT Loko, dont je suis le président.",
+      lead:"Projet porté par l'Association des Étudiants GMPE de l'Université UTT Loko, dont je suis le vice-président.",
       points:["Conception d'une journée de rencontre entre étudiants et employeurs des mines et du pétrole.",
               "Démarches de partenariat auprès de la Chambre des Mines de Côte d'Ivoire, de la SIR et de la GIZ.",
               "Objectif : rapprocher la formation des besoins réels de recrutement et valoriser les compétences locales."],
@@ -934,7 +934,7 @@ document.documentElement.classList.add('js');
   /* ---------- texte tapé ---------- */
   var PHRASES = {
     pro: ['Géologie, Mines, Pétrole & Environnement', 'Eau & gestion de l\u2019environnement', 'QHSE & normes ISO', 'Stage en raffinerie (SIR)'],
-    projets: ['Imagerie satellite & data', 'Outils numériques pour le climat', 'Président de l\u2019AE-GMPE', 'Reboisement & actions de terrain']
+    projets: ['Imagerie satellite & data', 'Outils numériques pour le climat', 'Vice-président de l\u2019AE-GMPE', 'Reboisement & actions de terrain']
   };
   var phrases = PHRASES.pro;
   var typedEl = document.getElementById('typed');
@@ -956,7 +956,7 @@ document.documentElement.classList.add('js');
     pro: { chip:'Volet professionnel', cta:'Voir mon parcours', href:'#pro',
       intro:'Étudiant en troisième année de licence professionnelle à l\u2019UTT Loko d\u2019Abidjan, option eau et gestion de l\u2019environnement. Stage à la Société Ivoirienne de Raffinage, formation QHSE et certifications internationales : voici mon parcours.' },
     projets: { chip:'Volet projets & engagement', cta:'Voir mes projets', href:'#projets',
-      intro:'Président de l\u2019AE-GMPE, je construis des outils pour l\u2019environnement (détection d\u2019orpaillage par satellite, calculateur d\u2019empreinte carbone, jeu sur Abidjan) et je m\u2019engage sur le terrain : reboisement, nettoyage de plage, Fresque du Climat.' }
+      intro:'Vice-président de l\u2019AE-GMPE, je construis des outils pour l\u2019environnement (détection d\u2019orpaillage par satellite, calculateur d\u2019empreinte carbone, jeu sur Abidjan) et je m\u2019engage sur le terrain : reboisement, nettoyage de plage, Fresque du Climat.' }
   };
   var duo = document.getElementById('duo'), mode = 'pro';
   var personas = { pro: duo.querySelector('.persona[data-mode="pro"]'), projets: duo.querySelector('.persona[data-mode="projets"]') };

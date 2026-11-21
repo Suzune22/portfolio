@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8" /><title>Planche A4 — badges QR</title>
+<style>
+  /* A4 : 9 badges 54 × 85,6 mm (3 colonnes × 3 lignes), traits de coupe gris clair. Page 1 recto, page 2 verso. */
+  @page{ size:A4; margin:0; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .sheet{ width:210mm; height:297mm; display:grid; grid-template-columns:repeat(3,54mm); grid-template-rows:repeat(3,85.6mm); gap:4mm;
+    justify-content:center; align-content:center; break-after:page; }
+  .sheet img{ width:54mm; height:85.6mm; display:block; outline:.1mm solid #d0d0d0; }
+</style></head>
+<body>
+<div class="sheet" id="r"></div>
+<div class="sheet" id="v"></div>
+<script>
+  for (var i = 0; i < 9; i++){
+    document.getElementById('r').insertAdjacentHTML('beforeend', '<img src="badge-recto.png" alt="" />');
+    document.getElementById('v').insertAdjacentHTML('beforeend', '<img src="badge-verso.png" alt="" />');
+  }
+</script>
+</body></html>
